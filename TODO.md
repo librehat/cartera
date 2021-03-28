@@ -1,0 +1,5 @@
+- [ ] Data model (ISIN, exchange-level symbols)
+- [ ] Multi accounts
+- [ ] Monitor watch lists
+- [ ] Monitor current positions
+- [ ] Generate tax report

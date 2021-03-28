@@ -5,6 +5,8 @@
 #include <KLocalizedContext>
 #include <KLocalizedString>
 
+#include "feed/abstractfeed.h"
+
 int main(int argc, char *argv[])
 {
     QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
