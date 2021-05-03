@@ -16,26 +16,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "feedrepository.h"
+#include "book.h"
 
 namespace cartera {
 
-FeedRepository::FeedRepository(QObject *parent)
+Book::Book(QObject *parent)
 : QObject(parent)
 {}
 
-void FeedRepository::addFeedHandler(const FeedIdentifier& identifier, AbstractFeed *feed)
+void Book::updatePosition(const Transaction& trn)
 {
-    m_feeds[identifier] = feed;
-}
-
-AbstractFeed* FeedRepository::getFeedHanlder(const FeedIdentifier& identifier)
-{
-    auto it = m_feeds.find(identifier);
-    if (it == m_feeds.end()) {
-        return nullptr;
+    auto it = m_positions.find(trn.positionIdentifier());
+    if (it == m_positions.end()) {
+        m_positions.insert(it, trn.positionIdentifier(), Position(trn.positionIdentifier(), trn.quantity(), trn.averagePrice()));
+        return;
     }
-    return *it;
+    // otherwise, calculate the new average price for the existing position
+    const qreal value = (it->quantity() * it->averagePrice()) + (trn.averagePrice() * trn.quantity());
+    it->setQuantity(it->quantity() + trn.quantity());
+    if (it->quantity() == 0) {
+        // no more open position, removing it from the book
+        m_positions.erase(it);
+    } else {
+        it->setAveragePrice(value / it->quantity());
+    }
 }
 
-}  // close cartera namespace
+    
+}  // close namespace cartera

@@ -4,6 +4,9 @@ set(libcarteracore_SRCS
     feed/feedrepository.cpp
     feed/financialinstrument.cpp
     feed/yahoofinancefeed.cpp
+    book/book.cpp
+    book/position.cpp
+    book/transaction.cpp
 )
 
 # It's a private library, build and link it statically to avoid having to deal with Qt shared library stuff

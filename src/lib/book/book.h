@@ -16,32 +16,41 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef FEEDREPOSITORY_H
-#define FEEDREPOSITORY_H
+#ifndef BOOK_H
+#define BOOK_H
 
+#include <qmap.h>
 #include <qobject.h>
-#include <qhash.h>
 
-#include "abstractfeed.h"
+#include "position.h"
+#include "transaction.h"
 
 namespace cartera {
-
-using FeedIdentifier = QString;
     
-class FeedRepository : public QObject
+/**
+ * Book is a logical group of multiple positions
+ * 
+ * This can be used to represent an "account" for example
+ */
+class Book : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit FeedRepository(QObject *parent = nullptr);
-    
-    void addFeedHandler(const FeedIdentifier& identifier, AbstractFeed *feed);
-    
-    AbstractFeed* getFeedHanlder(const FeedIdentifier& identifier);
+    explicit Book(QObject *parent = nullptr);
 
+    virtual ~Book() = default;
+    
+    /**
+     * Updates the position in this book by a transaction
+     */
+    void updatePosition(const Transaction& trn);
+    
 private:
-    QHash<FeedIdentifier, AbstractFeed*> m_feeds;
+    // TODO: use QHash
+    QMap<PositionIdentifier, Position> m_positions;
 };
 
-}
-#endif // FEEDREPOSITORY_H
+}  // close namespace cartera
+
+#endif // BOOK_H
