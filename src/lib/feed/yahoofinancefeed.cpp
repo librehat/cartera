@@ -22,7 +22,7 @@
 #include <qnetworkrequest.h>
 #include <qjsondocument.h>
 
-using namespace cartera;
+namespace cartera {
 
 namespace {
     
@@ -128,9 +128,10 @@ QList<FinancialInstrument> s_parseSearchFunc(const QByteArray& data)
 
 }  // close unnamed namespace
 
+
 YahooFinanceFeed::YahooFinanceFeed()
 : YahooFinanceFeed(new QNetworkAccessManager())
-{
+{    
 }
 
 YahooFinanceFeed::YahooFinanceFeed(QNetworkAccessManager *netman)
@@ -140,7 +141,7 @@ YahooFinanceFeed::YahooFinanceFeed(QNetworkAccessManager *netman)
 
 YahooFinanceFeed::~YahooFinanceFeed()
 {
-    delete m_netman;
+    m_netman->deleteLater();
 }
 
 /**
@@ -167,3 +168,5 @@ FeedReply<QList<FinancialInstrument>> YahooFinanceFeed::searchSymbols(const QStr
     QNetworkReply *reply = m_netman->get(req);
     return FeedReply<QList<FinancialInstrument>>(reply, s_parseSearchFunc);
 }
+
+}  // close cartera namespace

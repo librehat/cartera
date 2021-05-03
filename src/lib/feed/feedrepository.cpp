@@ -16,4 +16,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "abstractfeed.h"
+#include "feedrepository.h"
+
+namespace cartera {
+
+FeedRepository::FeedRepository(QObject *parent)
+: QObject(parent)
+{}
+
+void FeedRepository::addFeedHandler(const QString& identifier, AbstractFeed *feed)
+{
+    m_feeds[identifier] = feed;
+}
+
+AbstractFeed* FeedRepository::getFeedHanlder(const QString& identifier)
+{
+    auto it = m_feeds.find(identifier);
+    if (it == m_feeds.end()) {
+        return nullptr;
+    }
+    return *it;
+}
+
+}  // close cartera namespace

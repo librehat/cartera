@@ -16,4 +16,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef FEEDREPOSITORY_H
+#define FEEDREPOSITORY_H
+
+#include <qobject.h>
+#include <qhash.h>
+
 #include "abstractfeed.h"
+
+namespace cartera {
+    
+class FeedRepository : public QObject
+{
+    Q_OBJECT
+
+public:
+    explicit FeedRepository(QObject *parent = nullptr);
+    
+    void addFeedHandler(const QString& identifier, AbstractFeed *feed);
+    
+    AbstractFeed* getFeedHanlder(const QString& identifier);
+
+private:
+    QHash<QString, AbstractFeed*> m_feeds;
+};
+
+}
+#endif // FEEDREPOSITORY_H

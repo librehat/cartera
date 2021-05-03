@@ -18,4 +18,6 @@
 
 #include "financialinstrument.h"
 
-using namespace cartera;
+namespace cartera {
+
+}

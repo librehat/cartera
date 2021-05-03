@@ -18,7 +18,7 @@
 
 #include "feedreplyprivate.h"
 
-using namespace cartera;
+namespace cartera {
 
 
 // -------------------
@@ -67,3 +67,5 @@ FeedReplyPrivate::~FeedReplyPrivate()
 {
     m_reply->deleteLater();
 }
+
+}  // close cartera namespace

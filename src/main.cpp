@@ -2,10 +2,12 @@
 #include <QQmlApplicationEngine>
 #include <QtQml>
 #include <QUrl>
+#include <KIO/AccessManager>
 #include <KLocalizedContext>
 #include <KLocalizedString>
 
-#include "feed/abstractfeed.h"
+#include "feed/feedrepository.h"
+#include "feed/yahoofinancefeed.h"
 
 int main(int argc, char *argv[])
 {
@@ -23,6 +25,12 @@ int main(int argc, char *argv[])
     if (engine.rootObjects().isEmpty()) {
         return -1;
     }
+    
+    // FIXME
+    cartera::FeedRepository repo(nullptr);
+    KIO::AccessManager *acm = new KIO::AccessManager(nullptr);
+    cartera::YahooFinanceFeed yhFeed(acm);
+    repo.addFeedHandler("YH", &yhFeed);
 
     return app.exec();
 }

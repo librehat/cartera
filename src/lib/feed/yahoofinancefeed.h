@@ -32,7 +32,6 @@ class YahooFinanceFeed : public AbstractFeed
 {
 public:
     explicit YahooFinanceFeed();
-    
     /**
      * Constructs a 'YahooFinanceFeed' instance with the specified access manager.
      * 'YahooFinanceFeed' will take over the ownership of the access manager.
