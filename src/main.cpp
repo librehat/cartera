@@ -2,7 +2,6 @@
 #include <QQmlApplicationEngine>
 #include <QtQml>
 #include <QUrl>
-#include <KIO/AccessManager>
 #include <KLocalizedContext>
 #include <KLocalizedString>
 
@@ -28,8 +27,7 @@ int main(int argc, char *argv[])
     
     // FIXME
     cartera::FeedRepository repo(nullptr);
-    KIO::AccessManager *acm = new KIO::AccessManager(nullptr);
-    cartera::YahooFinanceFeed yhFeed(acm);
+    cartera::YahooFinanceFeed yhFeed;
     repo.addFeedHandler("YH", &yhFeed);
 
     return app.exec();

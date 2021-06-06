@@ -21,7 +21,7 @@ include(KDECompilerSettings NO_POLICY_SCOPE)
 ################# Find dependencies #################
 
 find_package(Qt5 ${QT_MIN_VERSION} REQUIRED NO_MODULE COMPONENTS Core Quick Test Gui Widgets QuickControls2)
-find_package(KF5 ${KF5_MIN_VERSION} REQUIRED COMPONENTS Kirigami2 I18n KIO)  # TODO: make KIO optional
+find_package(KF5 ${KF5_MIN_VERSION} REQUIRED COMPONENTS Kirigami2 I18n)
 
 ################# Enable C++17 features for clang and gcc #################
 

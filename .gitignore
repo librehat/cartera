@@ -2,3 +2,5 @@ cartera.kdev4
 .kdev4/
 build/
 .vs/
+CMakeLists.txt.user
+CMakeSettings.json
