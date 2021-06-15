@@ -1,3 +1,4 @@
+- [ ] Replace carteracore implementation with STL+Boost
 - [ ] Data model (ISIN, exchange-level symbols)
 - [ ] Multi accounts
 - [ ] Monitor watch lists
