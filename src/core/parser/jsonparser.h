@@ -1,5 +1,4 @@
 /*
- * <one line to give the library's name and an idea of what it does.>
  * Copyright (C) 2021  Simeon Huang <symeon@librehat.com>
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -16,32 +15,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef FEEDREPOSITORY_H
-#define FEEDREPOSITORY_H
+#ifndef CARTERA_JSONPARSER_H
+#define CARTERA_JSONPARSER_H
 
-#include <qobject.h>
-#include <qhash.h>
+#include "types/financialinstrument.h"
+#include "types/feedsource.h"
 
-#include "abstractfeed.h"
+#include <vector>
 
 namespace cartera {
 
-using FeedIdentifier = QString;
-    
-class FeedRepository : public QObject
-{
-    Q_OBJECT
+template<feed_source SOURCE>
+struct json_parser {
+};
 
-public:
-    explicit FeedRepository(QObject *parent = nullptr);
-    
-    void addFeedHandler(const FeedIdentifier& identifier, AbstractFeed *feed);
-    
-    AbstractFeed* getFeedHanlder(const FeedIdentifier& identifier);
-
-private:
-    QHash<FeedIdentifier, AbstractFeed*> m_feeds;
+template<>
+struct json_parser<feed_source::YahooFinance> {
+    static financial_instrument parse_financial_instrument(const std::string& data);
+    static quote parse_quote(const std::string& data);
+    static std::vector<financial_instrument> parse_search_quote(const std::string& data);
 };
 
 }
-#endif // FEEDREPOSITORY_H
+
+#endif // CARTERA_JSONPARSER_H

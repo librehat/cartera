@@ -20,22 +20,20 @@
 
 namespace cartera {
 
-FeedRepository::FeedRepository(QObject *parent)
-: QObject(parent)
+FeedRepository::FeedRepository()
 {}
 
-void FeedRepository::addFeedHandler(const FeedIdentifier& identifier, AbstractFeed *feed)
+void FeedRepository::addFeedHandler(const feed_source& identifier, AbstractFeed *feed)
 {
     m_feeds[identifier] = feed;
 }
 
-AbstractFeed* FeedRepository::getFeedHanlder(const FeedIdentifier& identifier)
+AbstractFeed* FeedRepository::getFeedHanlder(const feed_source& identifier)
 {
-    auto it = m_feeds.find(identifier);
-    if (it == m_feeds.end()) {
+    if (identifier == feed_source::k_END) {
         return nullptr;
     }
-    return *it;
+    return m_feeds[identifier];
 }
 
 }  // close cartera namespace

@@ -16,40 +16,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CARTERA_ABSTRACTFEED_H
-#define CARTERA_ABSTRACTFEED_H
-
-#include <QtCore>
-
-#include "financialinstrument.h"
 #include "feedreplyprivate.h"
 
 namespace cartera {
 
-/**
- * Defines the protocol to retrieve financial instruments data
- */
-class AbstractFeed
-{
-public:
-    virtual ~AbstractFeed() = default;
-    
-    /**
-     * Resolves the financial instrument identified by the symbol.
-     */
-    virtual FeedReply<FinancialInstrument> resolveSymbol(const QString& symbol) = 0;
-    
-    /**
-     * Resolves the quote for the financial instrument identified by the symbol.
-     */
-    virtual FeedReply<Quote> resolveQuote(const QString& symbol) = 0;
-    
-    /**
-     * Searches possible financial instruments by keywords.
-     */
-    virtual FeedReply<QList<FinancialInstrument>> searchSymbols(const QString& keyword) = 0;
-};
 
+// -------------------
+// class FeedException
+// -------------------
+
+FeedException::FeedException(const std::string& error_message)
+: std::exception()
+, m_error_message(error_message)
+{
 }
 
-#endif // CARTERA_ABSTRACTFEED_H
+const char* FeedException::what() const noexcept
+{
+    return m_error_message.data();
+}
+
+}  // close cartera namespace

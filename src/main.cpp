@@ -5,9 +5,6 @@
 #include <KLocalizedContext>
 #include <KLocalizedString>
 
-#include "feed/feedrepository.h"
-#include "feed/yahoofinancefeed.h"
-
 int main(int argc, char *argv[])
 {
     QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
@@ -25,10 +22,5 @@ int main(int argc, char *argv[])
         return -1;
     }
     
-    // FIXME
-    cartera::FeedRepository repo(nullptr);
-    cartera::YahooFinanceFeed yhFeed;
-    repo.addFeedHandler("YH", &yhFeed);
-
     return app.exec();
 }

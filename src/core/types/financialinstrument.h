@@ -1,5 +1,4 @@
 /*
- * <one line to give the library's name and an idea of what it does.>
  * Copyright (C) 2021  Simeon Huang <symeon@librehat.com>
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -19,12 +18,16 @@
 #ifndef CARTERA_FINANCIALINSTRUMENT_H
 #define CARTERA_FINANCIALINSTRUMENT_H
 
-#include <QtCore>
+#include <string>
+#include <optional>
+#include <chrono>
+#include <ostream>
 
 namespace cartera {
 
-    
-enum class AssetClass
+using datetime = std::chrono::time_point<std::chrono::system_clock>;
+
+enum class asset_class
 {
     Equity,
     ETF,
@@ -34,39 +37,40 @@ enum class AssetClass
     Future,
     Other,  // This list should be expanded
 };
+std::ostream& operator<<(std::ostream& os, const asset_class& rhs);
 
 /**
  * Defines the structure of financial instruments data
  */
-struct FinancialInstrument
+struct financial_instrument
 {
-    AssetClass type;
+    asset_class type;
     
     // TODO: Yahoo Finance doesn't give this data.
-    // QString isin;  //  ISIN identifies a security (which might be traded at different exchanges under different symbols)
+    // std::string isin;  //  ISIN identifies a security (which might be traded at different exchanges under different symbols)
     
-    QString symbol;  // symbol is unique at exchange-level
-    QString exchangeCode;  // shortened exchange code (e.g. LSE, FRA)
-    QString longName;
-    QString shortName;
+    std::string symbol;  // symbol is unique at exchange-level
+    std::string exchange_code;  // shortened exchange code (e.g. LSE, FRA)
+    std::string long_name;
+    std::string short_name;
 };
 
 /**
  * Defines the real-time quote data
  */
-struct Quote
+struct quote
 {
-    QDateTime updatedTime;
-    QString symbol;
-    QString currency;  // ISO4217 currency code
-    double dayLowPrice;
-    double dayHighPrice;
-    double dayOpenPrice;
-    double prevDayClosePrice;
-    double currentPrice;
+    datetime updated_time;
+    std::string symbol;
+    std::string currency;  // ISO4217 currency code
+    double day_low_price;
+    double day_high_price;
+    double day_open_price;
+    double prev_day_close_price;
+    double current_price;
     double volume;
-    double isMarketOpen;
-    QVariant marketCap;  // nullable double
+    double is_market_open;
+    std::optional<double> market_cap;  // nullable double
 };
 
 

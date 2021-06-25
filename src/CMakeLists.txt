@@ -1,4 +1,4 @@
-add_subdirectory(lib)
+add_subdirectory(core)
 
 set(cartera_SRCS
     main.cpp

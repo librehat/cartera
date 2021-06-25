@@ -19,64 +19,40 @@
 #ifndef CARTERA_FEEDREPLYPRIVATE_H
 #define CARTERA_FEEDREPLYPRIVATE_H
 
-#include <qobject.h>
-#include <qnetworkreply.h>
-
 #include <exception>
 #include <functional>
 #include <variant>
+#include <string>
+
+#include <boost/beast/http.hpp>
+
+namespace http = boost::beast::http;
 
 namespace cartera {
-    
+
+using string_response = http::response<http::string_body>;
+
 class FeedException : public std::exception {
 public:
-    explicit FeedException(const QString& errorMessage);
+    explicit FeedException(const std::string& error_message);
     
     virtual const char* what() const noexcept override;
     
 private:
-    const QString m_errorMessage;
-};
-
-/**
- * A private class in order to support templated 'FeedReply'
- */
-class FeedReplyPrivate : public QObject
-{
-    Q_OBJECT
-
-public:
-    explicit FeedReplyPrivate(QNetworkReply *reply, QObject *parent = nullptr);
-    virtual ~FeedReplyPrivate();
-    
-    bool isFinished() const;
-    bool isRunning() const;
-    
-signals:
-    void finished();
-    
-protected:
-    bool m_isFinished;
-    QNetworkReply *m_reply;
-    
-    virtual void handleReplyData() = 0;
-    
-private slots:
-    void handleFinished();
+    const std::string m_error_message;
 };
 
 
 template<typename TYPE>
-class FeedReply : public FeedReplyPrivate {
+class FeedReply {
 public:
     /**
-     * Function that converts the byte array from the I/O device to the value type
+     * Function that converts the basic string from the response to the value type
      */
-    using ValueFn = std::function<TYPE(QByteArray)>;
+    using ValueFn = std::function<TYPE(std::string)>;
     
-    explicit FeedReply(QNetworkReply *reply, ValueFn func)
-    : FeedReplyPrivate(reply)
-    , m_data(QString())
+    explicit FeedReply(string_response *resp, ValueFn func)
+    : m_data(std::string())
     , m_func(std::move(func))
     {
     }
@@ -84,13 +60,13 @@ public:
     ~FeedReply() = default;
     
     bool hasError() const
-    {
-        return isFinished() && m_data.index() == 1;
+    {  // TODO check the response
+        return m_data.index() == 1;
     }
     
-    const QString& errorMessage() const
+    const std::string& errorMessage() const
     {
-        return std::get<QString>(m_data);
+        return std::get<std::string>(m_data);
     }
     
     const TYPE& value() const
@@ -98,7 +74,7 @@ public:
         return std::get<TYPE>(m_data);
     }
 
-protected:
+protected:/*
     virtual void handleReplyData() override
     {
         if (m_reply->error() != QNetworkReply::NoError) {
@@ -111,10 +87,10 @@ protected:
                 m_data = QString("Unknown Error");
             }
         }
-    }
+    }*/
     
 private:
-    std::variant<TYPE, QString> m_data;
+    std::variant<TYPE, std::string> m_data;
     ValueFn m_func;
 };
 

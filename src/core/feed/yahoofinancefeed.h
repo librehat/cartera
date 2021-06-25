@@ -1,5 +1,4 @@
 /*
- * <one line to give the library's name and an idea of what it does.>
  * Copyright (C) 2021  Simeon Huang <symeon@librehat.com>
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -19,8 +18,6 @@
 #ifndef CARTERA_YAHOOFINANCEFEED_H
 #define CARTERA_YAHOOFINANCEFEED_H
 
-#include <qnetworkaccessmanager.h>
-
 #include "abstractfeed.h"
 
 namespace cartera {
@@ -32,22 +29,15 @@ class YahooFinanceFeed : public AbstractFeed
 {
 public:
     explicit YahooFinanceFeed();
-    /**
-     * Constructs a 'YahooFinanceFeed' instance with the specified access manager.
-     * 'YahooFinanceFeed' will take over the ownership of the access manager.
-     * 
-     * This constructor allows the usage of 'KIO::AccessManager' on desktop Linux.
-     */
-    explicit YahooFinanceFeed(QNetworkAccessManager *netman);
     
     virtual ~YahooFinanceFeed();
     
-    virtual FeedReply<FinancialInstrument> resolveSymbol(const QString& symbol) override;
-    virtual FeedReply<Quote> resolveQuote(const QString& symbol) override;
-    virtual FeedReply<QList<FinancialInstrument>> searchSymbols(const QString& keyword) override;
+    virtual FeedReply<FinancialInstrument> resolveSymbol(const std::string& symbol) override;
+    virtual FeedReply<Quote> resolveQuote(const std::string& symbol) override;
+    virtual FeedReply<std::vector<FinancialInstrument>> searchSymbols(const std::string& keyword) override;
     
 protected:
-    QNetworkAccessManager *m_netman;
+    // QNetworkAccessManager *m_netman;
 };
 
 }
