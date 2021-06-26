@@ -18,19 +18,20 @@
 #define BOOST_TEST_MODULE jsonparsertest
 #include <boost/test/included/unit_test.hpp>
 
-#include <filesystem>
-#include <fstream>
+#include <boost/filesystem.hpp>
+#include <boost/filesystem/fstream.hpp>
+
 #include <string>
 
 #include "parser/jsonparser.h"
 #include "types/financialinstrument.h"
 
-namespace fs = std::filesystem;
+namespace fs = boost::filesystem;
 using yahoo_parser = cartera::json_parser<cartera::feed_source::YahooFinance>;
 
 static std::string read_file(fs::path path)
 {
-    std::ifstream f(path, std::ios::in | std::ios::binary);
+    fs::ifstream f(path, std::ios::in | std::ios::binary);
     const auto sz = fs::file_size(path);
     std::string result(sz, '\0');
     f.read(result.data(), sz);
@@ -44,8 +45,7 @@ BOOST_AUTO_TEST_CASE(parse_financial_instrument_empty)
 
 BOOST_AUTO_TEST_CASE(parse_financial_instrument_IBM)
 {
-    // FIXME: use working directory and the relative path 
-    const std::string json_filepath{ "C:\\cygwin64\\home\\libre\\Projects\\cartera\\src\\core\\tests\\fixture\\IBM.json" };
+    const std::string json_filepath{ "./fixture/IBM.json" };
     const auto result = yahoo_parser::parse_financial_instrument(read_file(json_filepath));
     
     BOOST_CHECK_EQUAL(result.symbol, "IBM");
@@ -57,8 +57,7 @@ BOOST_AUTO_TEST_CASE(parse_financial_instrument_IBM)
 
 BOOST_AUTO_TEST_CASE(parse_quote_IBM)
 {
-    // FIXME: use working directory and the relative path 
-    const std::string json_filepath{ "C:\\cygwin64\\home\\libre\\Projects\\cartera\\src\\core\\tests\\fixture\\IBM.json" };
+    const std::string json_filepath{ "./fixture/IBM.json" };
     const auto result = yahoo_parser::parse_quote(read_file(json_filepath));
 
     BOOST_CHECK_EQUAL(result.symbol, "IBM");
