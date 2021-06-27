@@ -1,5 +1,4 @@
 /*
- * <one line to give the library's name and an idea of what it does.>
  * Copyright (C) 2021  Simeon Huang <symeon@librehat.com>
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -15,42 +14,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+#ifndef CARTERA_TYPES_POSITIONIDENTIFIER_H
+#define CARTERA_TYPES_POSITIONIDENTIFIER_H
 
-#ifndef BOOK_H
-#define BOOK_H
-
-#include <qmap.h>
-#include <qobject.h>
-
-#include "position.h"
-#include "transaction.h"
+#include "feedsource.h"
+#include <string>
 
 namespace cartera {
-    
-/**
- * Book is a logical group of multiple positions
- * 
- * This can be used to represent an "account" for example
- */
-class Book : public QObject
-{
-    Q_OBJECT
 
-public:
-    explicit Book(QObject *parent = nullptr);
-
-    virtual ~Book() = default;
-    
-    /**
-     * Updates the position in this book by a transaction
-     */
-    void updatePosition(const Transaction& trn);
-    
-private:
-    // TODO: use QHash
-    QMap<PositionIdentifier, Position> m_positions;
+// Uniquely identifies a position (not necessarily a unique security)
+struct position_identifier {
+    feed_source source;
+    std::string symbol;
 };
 
-}  // close namespace cartera
+}
 
-#endif // BOOK_H
+#endif
