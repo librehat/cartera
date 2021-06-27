@@ -54,6 +54,9 @@ struct financial_instrument
     std::string long_name;
     std::string short_name;
 };
+std::ostream& operator<<(std::ostream& os, const financial_instrument& rhs);
+bool operator==(const financial_instrument& lhs, const financial_instrument& rhs);
+bool operator!=(const financial_instrument& lhs, const financial_instrument& rhs);
 
 /**
  * Defines the real-time quote data

@@ -27,6 +27,20 @@ namespace cartera {
 
 template<feed_source SOURCE>
 struct json_parser {
+    static financial_instrument parse_financial_instrument(const std::string& data)
+    {
+        static_assert(false, "Not implemented");
+    }
+
+    static quote parse_quote(const std::string& data)
+    {
+        static_assert(false, "Not implemented");
+    }
+
+    static std::vector<financial_instrument> parse_search_quote(const std::string& data)
+    {
+        static_assert(false, "Not implemented");
+    }
 };
 
 template<>

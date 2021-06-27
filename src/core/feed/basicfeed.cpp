@@ -1,5 +1,4 @@
 /*
- * <one line to give the library's name and an idea of what it does.>
  * Copyright (C) 2021  Simeon Huang <symeon@librehat.com>
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -16,4 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "abstractfeed.h"
+#include "basicfeed.h"
+
+namespace cartera {
+}  // close cartera namespace

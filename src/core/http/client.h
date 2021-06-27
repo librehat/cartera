@@ -1,5 +1,5 @@
 /*
- * <one line to give the library's name and an idea of what it does.>
+ * A wrapper around underlying networking library implementation
  * Copyright (C) 2021  Simeon Huang <symeon@librehat.com>
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -16,24 +16,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "feedreplyprivate.h"
+#ifndef CARTERA_HTTP_CLIENT_H
+#define CARTERA_HTTP_CLIENT_H
+#include <future>
+#include <string>
+
+#ifndef CARTERACORE_HTTP_CLIENT_TIMEOUT
+// The default timeout would be 60s
+#define CARTERACORE_HTTP_CLIENT_TIMEOUT 60000
+#endif
 
 namespace cartera {
 
+class simple_http_client {
+public:
+    explicit simple_http_client();
 
-// -------------------
-// class FeedException
-// -------------------
+    ~simple_http_client();
 
-FeedException::FeedException(const std::string& error_message)
-: std::exception()
-, m_error_message(error_message)
-{
+    std::string get(const std::string& url);
+
+    std::future<std::string> get_future(const std::string& url);
+};
 }
 
-const char* FeedException::what() const noexcept
-{
-    return m_error_message.data();
-}
-
-}  // close cartera namespace
+#endif

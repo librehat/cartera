@@ -26,6 +26,7 @@ find_package(KF5 ${KF5_MIN_VERSION} REQUIRED COMPONENTS Kirigami2 I18n)
 ################# Enable C++17 features for clang and gcc #################
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_C_STANDARD 11)
 
 ################# Extra flags #################
 if (NOT CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")

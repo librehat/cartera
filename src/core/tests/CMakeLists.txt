@@ -1,7 +1,7 @@
 find_package(Boost COMPONENTS filesystem REQUIRED)
 
 enable_testing()
-add_executable(carteracoretest jsonparser.t.cpp)
+add_executable(carteracoretest jsonparser.t.cpp "httpclient.t.cpp" "basicfeed.t.cpp")
 
 if(WIN32)
     set_target_properties(carteracoretest PROPERTIES LINK_FLAGS_DEBUG "/SUBSYSTEM:CONSOLE")
@@ -19,4 +19,4 @@ target_include_directories(carteracoretest
 )
 target_link_libraries(carteracoretest carteracore ${Boost_LIBRARIES})
 
-add_test(NAME jsonparsertest COMMAND carteracoretest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+add_test(NAME "test" COMMAND carteracoretest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
