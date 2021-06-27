@@ -28,8 +28,9 @@ find_package(KF5 ${KF5_MIN_VERSION} REQUIRED COMPONENTS Kirigami2 I18n)
 set(CMAKE_CXX_STANDARD 17)
 
 ################# Extra flags #################
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fexceptions")
-
+if (NOT CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fexceptions")
+endif()
 ################# build and install #################
 add_subdirectory(src)
 
