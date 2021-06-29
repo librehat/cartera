@@ -34,9 +34,9 @@ public:
 
     ~simple_http_client();
 
-    std::string get(const std::string& url);
+    std::string get(const std::string& url) const;
 
-    std::future<std::string> get_future(const std::string& url);
+    std::future<std::string> get_future(const std::string& url) const;
 };
 }
 

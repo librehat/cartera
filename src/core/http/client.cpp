@@ -42,7 +42,7 @@ simple_http_client::~simple_http_client()
 {
 }
 
-std::string simple_http_client::get(const std::string& url)
+std::string simple_http_client::get(const std::string& url) const
 {
     const cpr::Response r = cpr::Get(
         cpr::Url{ url },
@@ -51,7 +51,7 @@ std::string simple_http_client::get(const std::string& url)
     return extract_response(r);
 }
 
-std::future<std::string> simple_http_client::get_future(const std::string& url)
+std::future<std::string> simple_http_client::get_future(const std::string& url) const
 {
     auto response_text_p = std::make_shared<std::promise<std::string>>();
     const auto fut = cpr::GetCallback(

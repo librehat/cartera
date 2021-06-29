@@ -46,19 +46,19 @@ struct search_url {
 template<feed_source SOURCE>
 struct basic_feed
 {
-    static financial_instrument resolve_symbol(simple_http_client& client, const std::string& symbol)
+    static financial_instrument resolve_symbol(const simple_http_client& client, const std::string& symbol)
     {
         const std::string resp = client.get(details::symbol_url<SOURCE>::get(symbol));
         return json_parser<SOURCE>::parse_financial_instrument(resp);
     }
 
-    static quote resolve_quote(simple_http_client& client, const std::string& symbol)
+    static quote resolve_quote(const simple_http_client& client, const std::string& symbol)
     {
         const std::string resp = client.get(details::quote_url<SOURCE>::get(symbol));
         return json_parser<SOURCE>::parse_quote(resp);
     }
 
-    static std::vector<financial_instrument> search_symbols(simple_http_client& client, const std::string& keyword)
+    static std::vector<financial_instrument> search_symbols(const simple_http_client& client, const std::string& keyword)
     {
         const std::string resp = client.get(details::search_url<SOURCE>::get(keyword));
         return json_parser<SOURCE>::parse_search_quote(resp);

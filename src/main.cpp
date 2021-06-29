@@ -5,6 +5,8 @@
 #include <KLocalizedContext>
 #include <KLocalizedString>
 
+#include "backend.h"
+
 int main(int argc, char *argv[])
 {
     QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
@@ -13,7 +15,10 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationDomain("librehat.com");
     QCoreApplication::setApplicationName("Cartera");
 
+    QScopedPointer<cartera::Backend> backend(new cartera::Backend());
+
     QQmlApplicationEngine engine;
+    qmlRegisterSingletonInstance("com.librehat.cartera", 1, 0, "Backend", backend.get());
 
     engine.rootContext()->setContextObject(new KLocalizedContext(&engine));
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
