@@ -89,6 +89,11 @@ struct urls<feed_source::Binance> {
     {
         return "https://api.binance.com/api/v3/ticker/24hr?symbol=" + symbol;
     }
+
+    static std::string search(const std::string&)
+    {
+        return "";  // TODO
+    }
 };
 
 }  // close details namespace 

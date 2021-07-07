@@ -40,7 +40,9 @@ template<>
 struct json_parser<feed_source::Binance> {
     static financial_instrument parse_financial_instrument(const std::string& data);
     static quote parse_quote(const std::string& data);
-    // Binance doesn't have search endpoint
+    
+    // Binance doesn't have search endpoint, this function parses the full exchangeInfo response
+    static std::vector<symbol_search_result> parse_search_quote(const std::string& data);
 };
 
 }

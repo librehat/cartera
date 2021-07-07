@@ -32,11 +32,19 @@ class simple_http_client {
 public:
     explicit simple_http_client();
 
-    ~simple_http_client();
+    virtual ~simple_http_client();
 
     std::string get(const std::string& url) const;
 
     std::future<std::string> get_future(const std::string& url) const;
+};
+
+
+class cached_http_client {
+public:
+    explicit cached_http_client(simple_http_client& http_client);
+
+    std::string get(const std::string& url) const;
 };
 }
 

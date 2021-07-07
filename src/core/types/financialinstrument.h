@@ -39,7 +39,8 @@ enum class asset_class
     Future,
     Other,  // This list should be expanded
     FX,
-    Crypto,  // Crypto-currency.
+    CryptoCurrency,
+    Option,
 
     k_END,
 };

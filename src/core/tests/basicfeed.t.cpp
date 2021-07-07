@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE(basic_feed_binance_symbol)
     const financial_instrument res = basic_feed::resolve_symbol<feed_source::Binance>(client, "ETHBTC");
     BOOST_CHECK_EQUAL(res.symbol, "ETHBTC");
     BOOST_CHECK_EQUAL(res.currency, "BTC");
-    BOOST_CHECK_EQUAL(res.type, cartera::asset_class::Crypto);
+    BOOST_CHECK_EQUAL(res.type, cartera::asset_class::CryptoCurrency);
 }
 
 BOOST_AUTO_TEST_CASE(basic_feed_binance_quote)

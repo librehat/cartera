@@ -21,6 +21,8 @@
 #include <boost/json.hpp>
 #include <sstream>
 
+namespace json = boost::json;
+
 namespace cartera {
 
 namespace {
@@ -36,11 +38,17 @@ asset_class asset_class_from_quote_type(const STRING& quote_type)
     if (quote_type == "INDEX") {
         return asset_class::Index;
     }
+    if (quote_type == "OPTION") {
+        return asset_class::Option;
+    }
+    if (quote_type == "CRYPTOCURRENCY") {
+        return asset_class::CryptoCurrency;
+    }
     // TODO: complete the mapping
     return asset_class::Other;
 }
 
-double json_value_as_double(const boost::json::value& val)
+double json_value_as_double(const json::value& val)
 {
     // Boost.JSON treats it as an integer when there is no decimal place in the number
     if (val.is_double()) {
@@ -63,8 +71,6 @@ double json_value_as_double(const boost::json::value& val)
 
 financial_instrument json_parser<feed_source::YahooFinance>::parse_financial_instrument(const std::string& data)
 {
-    using namespace boost;
-
     const json::value document = json::parse(data);
     const json::object& root = document.as_object();
     const json::object& quote_summary = root.at("quoteSummary").as_object();
@@ -72,21 +78,22 @@ financial_instrument json_parser<feed_source::YahooFinance>::parse_financial_ins
         throw cartera_exception(quote_summary.at("error").as_string().data());
     }
     const json::array& result = quote_summary.at("result").as_array();
-    const json::value& quote_result = result.at(0).at("price");
+    const json::object& quote_result = result.at(0).at("price").as_object();
+
+    const auto& long_name = quote_result.contains("longName") && quote_result.at("longName").is_string() ? quote_result.at("longName") : quote_result.at("shortName");
+
     return financial_instrument{
         asset_class_from_quote_type(quote_result.at("quoteType").as_string()),
         quote_result.at("symbol").as_string().data(),
         quote_result.at("currency").as_string().data(),
         quote_result.at("exchange").as_string().data(),
-        quote_result.at("longName").as_string().data(),
+        long_name.as_string().data(),
         quote_result.at("shortName").as_string().data(),
     };
 }
 
 quote json_parser<feed_source::YahooFinance>::parse_quote(const std::string& data)
 {
-    using namespace boost;
-
     const json::value document = json::parse(data);
     const json::object& root = document.as_object();
     const json::object& quote_summary = root.at("quoteSummary").as_object();
@@ -123,8 +130,6 @@ quote json_parser<feed_source::YahooFinance>::parse_quote(const std::string& dat
 
 std::vector<symbol_search_result> json_parser<feed_source::YahooFinance>::parse_search_quote(const std::string& data)
 {
-    using namespace boost;
-
     std::vector<symbol_search_result> results{};
     
     const json::value document = json::parse(data);
@@ -151,16 +156,13 @@ std::vector<symbol_search_result> json_parser<feed_source::YahooFinance>::parse_
 
 financial_instrument json_parser<feed_source::Binance>::parse_financial_instrument(const std::string& data)
 {
-    // https://api.binance.com/api/v3/exchangeInfo?symbol=ETHBTC
-    using namespace boost;
-
     const json::value document = json::parse(data);
     const json::object& symbol = document.at("symbols").as_array()[0].as_object();
     std::ostringstream oss;
     oss << symbol.at("baseAsset").as_string().data() << "/" << symbol.at("quoteAsset").as_string().data();
     const auto name = oss.str();
     return financial_instrument{
-        asset_class::Crypto,
+        asset_class::CryptoCurrency,
         symbol.at("symbol").as_string().data(),
         symbol.at("quoteAsset").as_string().data(),
         {"BIN"}, // FIXME, a proper exchange code for Binance
@@ -171,9 +173,6 @@ financial_instrument json_parser<feed_source::Binance>::parse_financial_instrume
 
 quote json_parser<feed_source::Binance>::parse_quote(const std::string& data)
 {
-    // https://api.binance.com/api/v3/ticker/24hr?symbol=ETHBTC
-    using namespace boost;
-
     const json::value document = json::parse(data);
 
     return quote{
@@ -188,6 +187,12 @@ quote json_parser<feed_source::Binance>::parse_quote(const std::string& data)
         true, // FIXME
         std::optional<double>(),
     };
+}
+
+std::vector<symbol_search_result> json_parser<feed_source::Binance>::parse_search_quote(const std::string& data)
+{
+    // TODO
+    return {};
 }
 
 }  // close cartera namespace
