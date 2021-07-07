@@ -28,60 +28,66 @@ namespace cartera {
 
 namespace details {
 template<feed_source SOURCE>
-struct symbol_url {};
-
-template<feed_source SOURCE>
-struct quote_url {};
-
-template<feed_source SOURCE>
-struct search_url {};
+struct urls {};
 }  // close details namespace 
 
-template<feed_source SOURCE>
 struct basic_feed
 {
+    template<feed_source SOURCE>
     static financial_instrument resolve_symbol(const simple_http_client& client, const std::string& symbol)
     {
-        const std::string resp = client.get(details::symbol_url<SOURCE>::get(symbol));
+        const std::string resp = client.get(details::urls<SOURCE>::symbol(symbol));
         return json_parser<SOURCE>::parse_financial_instrument(resp);
     }
 
+    template<feed_source SOURCE>
     static quote resolve_quote(const simple_http_client& client, const std::string& symbol)
     {
-        const std::string resp = client.get(details::quote_url<SOURCE>::get(symbol));
+        const std::string resp = client.get(details::urls<SOURCE>::quote(symbol));
         return json_parser<SOURCE>::parse_quote(resp);
     }
 
+    template<feed_source SOURCE>
     static std::vector<symbol_search_result> search_symbols(const simple_http_client& client, const std::string& keyword)
     {
-        const std::string resp = client.get(details::search_url<SOURCE>::get(keyword));
+        const std::string resp = client.get(details::urls<SOURCE>::search(keyword));
         return json_parser<SOURCE>::parse_search_quote(resp);
     }
 };
 
+template<>
+std::vector<symbol_search_result> basic_feed::search_symbols<feed_source::Binance>(const simple_http_client& client, const std::string& keyword);
+
 
 namespace details {
 template<>
-struct symbol_url<feed_source::YahooFinance> {
-    static std::string get(const std::string& symbol)
+struct urls<feed_source::YahooFinance> {
+    static std::string symbol(const std::string& symbol)
     {
         return "https://query1.finance.yahoo.com/v10/finance/quoteSummary/" + symbol + "?modules=price";
     }
-};
-
-template<>
-struct quote_url<feed_source::YahooFinance> {
-    static std::string get(const std::string& symbol)
+    
+    static std::string quote(const std::string& symbol)
     {
-        return symbol_url<feed_source::YahooFinance>::get(symbol);
+        return urls::symbol(symbol);
+    }
+    
+    static std::string search(const std::string& keyword)
+    {
+        return "https://query2.finance.yahoo.com/v1/finance/search?q=" + keyword + "&quotesCount=10&newsCount=0";
     }
 };
 
 template<>
-struct search_url<feed_source::YahooFinance> {
-    static std::string get(const std::string& keyword)
+struct urls<feed_source::Binance> {
+    static std::string symbol(const std::string& symbol)
     {
-        return "https://query2.finance.yahoo.com/v1/finance/search?q=" + keyword + "&quotesCount=10&newsCount=0";
+        return "https://api.binance.com/api/v3/exchangeInfo?symbol=" + symbol;
+    }
+
+    static std::string quote(const std::string& symbol)
+    {
+        return "https://api.binance.com/api/v3/ticker/24hr?symbol=" + symbol;
     }
 };
 

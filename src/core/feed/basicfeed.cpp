@@ -18,4 +18,13 @@
 #include "basicfeed.h"
 
 namespace cartera {
+
+template<>
+std::vector<symbol_search_result> basic_feed::search_symbols<feed_source::Binance>(const simple_http_client& client, const std::string& keyword)
+{
+    // Binance doesn't have search API. We list all known symbols at the exchange and then search it
+    // To improve the performance and to not exceed the rate limits, we cache the full list in-memory.
+    return {}; // TODO
+}
+
 }  // close cartera namespace

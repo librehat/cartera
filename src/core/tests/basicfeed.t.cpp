@@ -5,19 +5,18 @@
 #include "http/client.h"
 
 using namespace cartera;
+simple_http_client client;
 
 BOOST_AUTO_TEST_CASE(basic_feed_yahoo_finance_symbol)
 {
-    simple_http_client client;
-    const financial_instrument res = basic_feed<feed_source::YahooFinance>::resolve_symbol(client, "IBM");
+    const financial_instrument res = basic_feed::resolve_symbol<feed_source::YahooFinance>(client, "IBM");
     BOOST_CHECK_EQUAL(res.symbol, "IBM");
     BOOST_CHECK_EQUAL(res.exchange_code, "NYQ");
 }
 
 BOOST_AUTO_TEST_CASE(basic_feed_yahoo_finance_quote)
 {
-    simple_http_client client;
-    const quote res = basic_feed<feed_source::YahooFinance>::resolve_quote(client, "IBM");
+    const quote res = basic_feed::resolve_quote<feed_source::YahooFinance>(client, "IBM");
     BOOST_CHECK_EQUAL(res.symbol, "IBM");
     BOOST_CHECK(res.market_cap.has_value());
     if (res.market_cap.has_value()) {
@@ -29,8 +28,7 @@ BOOST_AUTO_TEST_CASE(basic_feed_yahoo_finance_quote)
 
 BOOST_AUTO_TEST_CASE(basic_feed_yahoo_finance_search)
 {
-    simple_http_client client;
-    const auto results = basic_feed<feed_source::YahooFinance>::search_symbols(client, "IBM");
+    const auto results = basic_feed::search_symbols<feed_source::YahooFinance>(client, "IBM");
     BOOST_CHECK_GT(results.size(), 2);
     // Just check IBM itself is the first one and the two are different for now
     BOOST_CHECK_EQUAL(results[0].symbol, "IBM");
@@ -39,4 +37,27 @@ BOOST_AUTO_TEST_CASE(basic_feed_yahoo_finance_search)
     BOOST_CHECK_EQUAL(results[0].type, cartera::asset_class::Equity);
     BOOST_CHECK_EQUAL(results[0].name, "International Business Machines Corporation");
     BOOST_CHECK_NE(results[0], results[1]);
+}
+
+BOOST_AUTO_TEST_CASE(basic_feed_binance_symbol)
+{
+    const financial_instrument res = basic_feed::resolve_symbol<feed_source::Binance>(client, "ETHBTC");
+    BOOST_CHECK_EQUAL(res.symbol, "ETHBTC");
+    BOOST_CHECK_EQUAL(res.currency, "BTC");
+    BOOST_CHECK_EQUAL(res.type, cartera::asset_class::Crypto);
+}
+
+BOOST_AUTO_TEST_CASE(basic_feed_binance_quote)
+{
+    const quote res = basic_feed::resolve_quote<feed_source::Binance>(client, "DOGEUSDT");
+    BOOST_CHECK_EQUAL(res.symbol, "DOGEUSDT");
+    BOOST_CHECK(!res.market_cap.has_value());
+    BOOST_CHECK_GT(res.current_price, 0);
+    BOOST_CHECK_GT(res.volume, 0);
+}
+
+BOOST_AUTO_TEST_CASE(basic_feed_binance_search)
+{
+    const auto res = basic_feed::search_symbols<feed_source::Binance>(client, "DOGE");
+    BOOST_CHECK_EQUAL(0, res.size());  //TODO
 }

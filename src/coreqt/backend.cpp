@@ -71,7 +71,7 @@ void Backend::getQuote(const QString& symbol, const QJSValue& callback) const
         });
     watcher->setFuture(
         QtConcurrent::run([symbol, this]() {
-            return Quote{ basic_feed<feed_source::YahooFinance>::resolve_quote(m_http_client, symbol.toStdString()) };
+            return Quote{ basic_feed::resolve_quote<feed_source::YahooFinance>(m_http_client, symbol.toStdString()) };
             })
     );
 }
