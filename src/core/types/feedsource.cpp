@@ -14,22 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef CARTERA_FEEDSOURCE_H
-#define CARTERA_FEEDSOURCE_H
 
-#include <ostream>
+#include "feedsource.h"
+
+#include <magic_enum.hpp>
 
 namespace cartera {
-
-enum class feed_source {
-    YahooFinance,
-
-    Binance,
-
-    k_END,
-};
-std::ostream& operator<<(std::ostream& os, const feed_source& rhs);
-
+std::ostream& operator<<(std::ostream& os, const feed_source& rhs) {
+    os << magic_enum::enum_name(rhs);
+    return os;
 }
 
-#endif
+}

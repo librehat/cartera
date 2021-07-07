@@ -26,16 +26,42 @@ std::ostream& operator<<(std::ostream& os, const asset_class& rhs) {
     return os;
 }
 
+std::ostream& operator<<(std::ostream& os, const symbol_search_result& rhs)
+{
+    os << "{ type=" << rhs.type
+       << " symbol=" << rhs.symbol
+       << " source=" << rhs.source
+       << " exchange=" << rhs.exchange_code
+       << " name=" << rhs.name
+       << " }";
+    return os;
+}
+
+bool operator==(const symbol_search_result& lhs, const symbol_search_result& rhs)
+{
+    return lhs.source == rhs.source &&
+        lhs.exchange_code == rhs.exchange_code &&
+        lhs.type == rhs.type &&
+        lhs.symbol == rhs.symbol &&
+        lhs.name == rhs.name;
+}
+
+bool operator!=(const symbol_search_result& lhs, const symbol_search_result& rhs)
+{
+    return !(lhs == rhs);
+}
+
 std::ostream& operator<<(std::ostream& os, const financial_instrument& rhs) {
     os << "{ type=" << rhs.type;
     os << " symbol=" << rhs.symbol;
+    os << " currency=" << rhs.currency;
     os << " exchange=" << rhs.exchange_code;
     os << " name=" << rhs.short_name << " (" << rhs.long_name << ") }";
     return os;
 }
 
 bool operator==(const financial_instrument& lhs, const financial_instrument& rhs) {
-    return lhs.type == rhs.type && lhs.symbol == rhs.symbol && lhs.exchange_code == rhs.exchange_code && lhs.short_name == rhs.short_name && lhs.long_name == rhs.long_name;
+    return lhs.type == rhs.type && lhs.symbol == rhs.symbol && lhs.currency == rhs.currency && lhs.exchange_code == rhs.exchange_code && lhs.short_name == rhs.short_name && lhs.long_name == rhs.long_name;
 }
 
 bool operator!=(const financial_instrument& lhs, const financial_instrument& rhs) {

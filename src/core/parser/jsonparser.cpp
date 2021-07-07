@@ -19,6 +19,7 @@
 #include "types/exceptions.h"
 
 #include <boost/json.hpp>
+#include <sstream>
 
 namespace cartera {
 
@@ -51,6 +52,10 @@ double json_value_as_double(const boost::json::value& val)
     if (val.is_uint64()) {
         return val.get_uint64();
     }
+    // Try to parse the string if that's the type
+    if (val.is_string()) {
+        return std::stod(val.get_string().data());
+    }
     throw cartera_exception("Cannot retrieve double from the JSON value");
 }
 
@@ -71,6 +76,7 @@ financial_instrument json_parser<feed_source::YahooFinance>::parse_financial_ins
     return financial_instrument{
         asset_class_from_quote_type(quote_result.at("quoteType").as_string()),
         quote_result.at("symbol").as_string().data(),
+        quote_result.at("currency").as_string().data(),
         quote_result.at("exchange").as_string().data(),
         quote_result.at("longName").as_string().data(),
         quote_result.at("shortName").as_string().data(),
@@ -104,7 +110,6 @@ quote json_parser<feed_source::YahooFinance>::parse_quote(const std::string& dat
     return quote{
         datetime(datetime::clock::duration(epoch_s)),
         quote_result.at("symbol").as_string().data(),
-        quote_result.at("currency").as_string().data(),
         json_value_as_double(quote_result.at("regularMarketDayLow").at("raw")),
         json_value_as_double(quote_result.at("regularMarketDayHigh").at("raw")),
         json_value_as_double(quote_result.at("regularMarketOpen").at("raw")),
@@ -116,27 +121,73 @@ quote json_parser<feed_source::YahooFinance>::parse_quote(const std::string& dat
     };
 }
 
-std::vector<financial_instrument> json_parser<feed_source::YahooFinance>::parse_search_quote(const std::string& data)
+std::vector<symbol_search_result> json_parser<feed_source::YahooFinance>::parse_search_quote(const std::string& data)
 {
     using namespace boost;
 
-    std::vector<financial_instrument> results{};
+    std::vector<symbol_search_result> results{};
     
     const json::value document = json::parse(data);
     const json::array& quotes = document.at("quotes").as_array();
     for (const auto& quote : quotes) {
+        const auto name =
+            quote.as_object().contains("longname") ?
+            quote.at("longname").as_string() :
+            (quote.as_object().contains("shortname") ? quote.at("shortname").as_string() : json::string{""});
         results.emplace_back(
-            financial_instrument{
+            symbol_search_result{
                 asset_class_from_quote_type(quote.at("quoteType").as_string()),
                 quote.at("symbol").as_string().data(),
+                feed_source::YahooFinance,
                 quote.at("exchange").as_string().data(),
-                quote.at("longname").as_string().data(),
-                quote.at("shortname").as_string().data(),
+                name.data(),
             }
         );
     }
     
     return results;
+}
+
+
+financial_instrument json_parser<feed_source::Binance>::parse_financial_instrument(const std::string& data)
+{
+    // https://api.binance.com/api/v3/exchangeInfo?symbol=ETHBTC
+    using namespace boost;
+
+    const json::value document = json::parse(data);
+    const json::object& symbol = document.at("symbols").as_array()[0].as_object();
+    std::ostringstream oss;
+    oss << symbol.at("baseAsset").as_string().data() << "/" << symbol.at("quoteAsset").as_string().data();
+    const auto name = oss.str();
+    return financial_instrument{
+        asset_class::Crypto,
+        symbol.at("symbol").as_string().data(),
+        symbol.at("quoteAsset").as_string().data(),
+        {"BIN"}, // FIXME, a proper exchange code for Binance
+        name,
+        name,
+    };
+}
+
+quote json_parser<feed_source::Binance>::parse_quote(const std::string& data)
+{
+    // https://api.binance.com/api/v3/ticker/24hr?symbol=ETHBTC
+    using namespace boost;
+
+    const json::value document = json::parse(data);
+
+    return quote{
+        datetime::clock::now(),
+        document.at("symbol").as_string().data(),
+        json_value_as_double(document.at("lowPrice")),
+        json_value_as_double(document.at("highPrice")),
+        json_value_as_double(document.at("openPrice")),
+        json_value_as_double(document.at("prevClosePrice")),
+        json_value_as_double(document.at("lastPrice")),
+        json_value_as_double(document.at("volume")),
+        true, // FIXME
+        std::optional<double>(),
+    };
 }
 
 }  // close cartera namespace

@@ -28,19 +28,13 @@ namespace cartera {
 
 namespace details {
 template<feed_source SOURCE>
-struct symbol_url {
-    static std::string get(const std::string&) { static_assert(false, "Not implemented"); }
-};
+struct symbol_url {};
 
 template<feed_source SOURCE>
-struct quote_url {
-    static std::string get(const std::string&) { static_assert(false, "Not implemented"); }
-};
+struct quote_url {};
 
 template<feed_source SOURCE>
-struct search_url {
-    static std::string get(const std::string&) { static_assert(false, "Not implemented"); }
-};
+struct search_url {};
 }  // close details namespace 
 
 template<feed_source SOURCE>
@@ -58,7 +52,7 @@ struct basic_feed
         return json_parser<SOURCE>::parse_quote(resp);
     }
 
-    static std::vector<financial_instrument> search_symbols(const simple_http_client& client, const std::string& keyword)
+    static std::vector<symbol_search_result> search_symbols(const simple_http_client& client, const std::string& keyword)
     {
         const std::string resp = client.get(details::search_url<SOURCE>::get(keyword));
         return json_parser<SOURCE>::parse_search_quote(resp);

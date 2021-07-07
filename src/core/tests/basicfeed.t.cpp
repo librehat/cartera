@@ -1,4 +1,5 @@
-#include <boost/test/unit_test.hpp>
+#define BOOST_TEST_MODULE basicfeedtest
+#include <boost/test/included/unit_test.hpp>
 
 #include "feed/basicfeed.h"
 #include "http/client.h"
@@ -34,8 +35,8 @@ BOOST_AUTO_TEST_CASE(basic_feed_yahoo_finance_search)
     // Just check IBM itself is the first one and the two are different for now
     BOOST_CHECK_EQUAL(results[0].symbol, "IBM");
     BOOST_CHECK_EQUAL(results[0].exchange_code, "NYQ");
+    BOOST_CHECK_EQUAL(results[0].source, cartera::feed_source::YahooFinance);
     BOOST_CHECK_EQUAL(results[0].type, cartera::asset_class::Equity);
-    BOOST_CHECK_EQUAL(results[0].long_name, "International Business Machines Corporation");
-    BOOST_CHECK_EQUAL(results[0].short_name, "International Business Machines");
+    BOOST_CHECK_EQUAL(results[0].name, "International Business Machines Corporation");
     BOOST_CHECK_NE(results[0], results[1]);
 }

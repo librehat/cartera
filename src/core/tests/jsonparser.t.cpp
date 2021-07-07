@@ -28,6 +28,7 @@
 
 namespace fs = boost::filesystem;
 using yahoo_parser = cartera::json_parser<cartera::feed_source::YahooFinance>;
+using binance_parser = cartera::json_parser<cartera::feed_source::Binance>;
 
 static std::string read_file(fs::path path)
 {
@@ -49,6 +50,7 @@ BOOST_AUTO_TEST_CASE(parse_financial_instrument_IBM)
     const auto result = yahoo_parser::parse_financial_instrument(read_file(json_filepath));
     
     BOOST_CHECK_EQUAL(result.symbol, "IBM");
+    BOOST_CHECK_EQUAL(result.currency, "USD");
     BOOST_CHECK_EQUAL(result.exchange_code, "NYQ");
     BOOST_CHECK_EQUAL(result.type, cartera::asset_class::Equity);
     BOOST_CHECK_EQUAL(result.long_name, "International Business Machines Corporation");
@@ -61,7 +63,6 @@ BOOST_AUTO_TEST_CASE(parse_quote_IBM)
     const auto result = yahoo_parser::parse_quote(read_file(json_filepath));
 
     BOOST_CHECK_EQUAL(result.symbol, "IBM");
-    BOOST_CHECK_EQUAL(result.currency, "USD");
     BOOST_CHECK_EQUAL(result.current_price, 136.38);
     BOOST_CHECK_EQUAL(result.day_high_price, 136.48);
     BOOST_CHECK_EQUAL(result.day_low_price, 133.12);
@@ -74,4 +75,32 @@ BOOST_AUTO_TEST_CASE(parse_quote_IBM)
     BOOST_CHECK_EQUAL(result.prev_day_close_price, 133.07);
     BOOST_CHECK_EQUAL(result.volume, 5567592);
     BOOST_CHECK_EQUAL(result.updated_time.time_since_epoch().count(), 1616788802);
+}
+
+BOOST_AUTO_TEST_CASE(parse_financial_instrument_ETHUSDT_Binance)
+{
+    const std::string json_filepath{ "./fixture/ETHUSDT_exchangeInfo.json" };
+    const auto result = binance_parser::parse_financial_instrument(read_file(json_filepath));
+
+    BOOST_CHECK_EQUAL(result.symbol, "ETHUSDT");
+    BOOST_CHECK_EQUAL(result.currency, "USDT");
+    BOOST_CHECK_EQUAL(result.short_name, "ETH/USDT");
+    BOOST_CHECK_EQUAL(result.long_name, "ETH/USDT");
+    BOOST_CHECK_EQUAL(result.type, cartera::asset_class::Crypto);
+}
+
+BOOST_AUTO_TEST_CASE(parse_quote_BTCUSDT_Binance)
+{
+    const std::string json_filepath{ "./fixture/BTCUSDT_24hr.json" };
+    const auto result = binance_parser::parse_quote(read_file(json_filepath));
+
+    BOOST_CHECK_EQUAL(result.current_price, 34617.7);
+    BOOST_CHECK_EQUAL(result.day_high_price, 35059.09);
+    BOOST_CHECK_EQUAL(result.day_low_price, 33532.0);
+    BOOST_CHECK_EQUAL(result.day_open_price, 34112.66);
+    BOOST_CHECK(result.is_market_open);
+    BOOST_CHECK(!result.market_cap.has_value());
+    BOOST_CHECK_EQUAL(result.prev_day_close_price, 34110.19);
+    BOOST_CHECK_EQUAL(result.symbol, "BTCUSDT");
+    BOOST_CHECK_EQUAL(result.volume, 53496.190443);
 }

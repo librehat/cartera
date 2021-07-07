@@ -33,6 +33,7 @@ class FinancialInstrument : public financial_instrument {
     //TODO: asset_class not able to be registered
     // Q_PROPERTY(asset_class type MEMBER type)
     Q_PROPERTY(QString symbol READ getSymbol)
+    Q_PROPERTY(QString currency READ getCurrency)
     Q_PROPERTY(QString exchangeNode READ getExchangeCode)
     Q_PROPERTY(QString shortName READ getShortName)
     Q_PROPERTY(QString longName READ getLongName)
@@ -49,6 +50,7 @@ public:
     FinancialInstrument& operator=(FinancialInstrument&& rhs) noexcept;
 
     STL_STRING_PROP_IMPL(getSymbol, symbol)
+    STL_STRING_PROP_IMPL(getCurrency, currency)
     STL_STRING_PROP_IMPL(getExchangeCode, exchange_code)
     STL_STRING_PROP_IMPL(getShortName, short_name)
     STL_STRING_PROP_IMPL(getLongName, long_name)
@@ -60,7 +62,6 @@ class Quote : public quote {
     
     // TODO: datetime updated_time
     Q_PROPERTY(QString symbol READ getSymbol)
-    Q_PROPERTY(QString currency READ getCurrency)
     Q_PROPERTY(double dayLowPrice MEMBER day_low_price)
     Q_PROPERTY(double dayHighPrice MEMBER day_high_price)
     Q_PROPERTY(double dayOpenPrice MEMBER day_open_price)
@@ -82,7 +83,6 @@ public:
     Quote& operator=(Quote&& rhs) noexcept;
 
     STL_STRING_PROP_IMPL(getSymbol, symbol)
-    STL_STRING_PROP_IMPL(getCurrency, currency)
 };
 
 

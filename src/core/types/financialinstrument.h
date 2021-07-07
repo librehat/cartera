@@ -23,6 +23,8 @@
 #include <chrono>
 #include <ostream>
 
+#include "feedsource.h"
+
 namespace cartera {
 
 using datetime = std::chrono::time_point<std::chrono::system_clock>;
@@ -36,8 +38,29 @@ enum class asset_class
     Cash,  // cash or cash equivalent
     Future,
     Other,  // This list should be expanded
+    FX,
+    Crypto,  // Crypto-currency.
+
+    k_END,
 };
 std::ostream& operator<<(std::ostream& os, const asset_class& rhs);
+
+
+/**
+ * Defines the structure that contains basic information about a symbol
+ */
+struct symbol_search_result
+{
+    asset_class type;
+    std::string symbol;
+    feed_source source;
+    std::string exchange_code;
+    std::string name;  // long name, or short name if long name doesn't exist
+};
+std::ostream& operator<<(std::ostream& os, const symbol_search_result& rhs);
+bool operator==(const symbol_search_result& lhs, const symbol_search_result& rhs);
+bool operator!=(const symbol_search_result& lhs, const symbol_search_result& rhs);
+
 
 /**
  * Defines the structure of financial instruments data
@@ -50,6 +73,7 @@ struct financial_instrument
     // std::string isin;  //  ISIN identifies a security (which might be traded at different exchanges under different symbols)
     
     std::string symbol;  // symbol is unique at exchange-level
+    std::string currency;  // ISO4217 currency code
     std::string exchange_code;  // shortened exchange code (e.g. LSE, FRA)
     std::string long_name;
     std::string short_name;
@@ -58,6 +82,7 @@ std::ostream& operator<<(std::ostream& os, const financial_instrument& rhs);
 bool operator==(const financial_instrument& lhs, const financial_instrument& rhs);
 bool operator!=(const financial_instrument& lhs, const financial_instrument& rhs);
 
+
 /**
  * Defines the real-time quote data
  */
@@ -65,7 +90,6 @@ struct quote
 {
     datetime updated_time;
     std::string symbol;
-    std::string currency;  // ISO4217 currency code
     double day_low_price;
     double day_high_price;
     double day_open_price;

@@ -2,6 +2,7 @@ set(libcarteracore_SRCS
 	"http/client.cpp"
     "feed/basicfeed.cpp"
     "parser/jsonparser.cpp"
+    "types/feedsource.cpp"
     "types/financialinstrument.cpp"
 )
 

@@ -27,27 +27,20 @@ namespace cartera {
 
 template<feed_source SOURCE>
 struct json_parser {
-    static financial_instrument parse_financial_instrument(const std::string& data)
-    {
-        static_assert(false, "Not implemented");
-    }
-
-    static quote parse_quote(const std::string& data)
-    {
-        static_assert(false, "Not implemented");
-    }
-
-    static std::vector<financial_instrument> parse_search_quote(const std::string& data)
-    {
-        static_assert(false, "Not implemented");
-    }
 };
 
 template<>
 struct json_parser<feed_source::YahooFinance> {
     static financial_instrument parse_financial_instrument(const std::string& data);
     static quote parse_quote(const std::string& data);
-    static std::vector<financial_instrument> parse_search_quote(const std::string& data);
+    static std::vector<symbol_search_result> parse_search_quote(const std::string& data);
+};
+
+template<>
+struct json_parser<feed_source::Binance> {
+    static financial_instrument parse_financial_instrument(const std::string& data);
+    static quote parse_quote(const std::string& data);
+    // Binance doesn't have search endpoint
 };
 
 }

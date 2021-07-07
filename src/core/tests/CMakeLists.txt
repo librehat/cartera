@@ -1,22 +1,28 @@
 find_package(Boost COMPONENTS filesystem REQUIRED)
 
 enable_testing()
-add_executable(carteracoretest jsonparser.t.cpp "httpclient.t.cpp" "basicfeed.t.cpp")
 
-if(WIN32)
-    set_target_properties(carteracoretest PROPERTIES LINK_FLAGS_DEBUG "/SUBSYSTEM:CONSOLE")
-    set_target_properties(carteracoretest PROPERTIES COMPILE_DEFINITIONS_DEBUG "_CONSOLE")
-    set_target_properties(carteracoretest PROPERTIES LINK_FLAGS_RELWITHDEBINFO "/SUBSYSTEM:CONSOLE")
-    set_target_properties(carteracoretest PROPERTIES COMPILE_DEFINITIONS_RELWITHDEBINFO "_CONSOLE")
-    set_target_properties(carteracoretest PROPERTIES LINK_FLAGS_RELEASE "/SUBSYSTEM:CONSOLE")
-    set_target_properties(carteracoretest PROPERTIES LINK_FLAGS_MINSIZEREL "/SUBSYSTEM:CONSOLE")
-endif(WIN32)
+list(APPEND CARTERACORE_UNIT_TESTS jsonparser.t httpclient.t basicfeed.t)
+list(APPEND CARTERACORE_UNIT_TESTS_DESC "JSONParser" "HTTPClient" "BasicFeed")
 
 
-target_include_directories(carteracoretest
-    PRIVATE ${Boost_INCLUDE_DIR}
-    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../
-)
-target_link_libraries(carteracoretest carteracore ${Boost_LIBRARIES})
+foreach(UNIT_TEST TEST_DESC IN ZIP_LISTS CARTERACORE_UNIT_TESTS CARTERACORE_UNIT_TESTS_DESC)
+	add_executable(${UNIT_TEST} ${UNIT_TEST}.cpp)
+	if(WIN32)
+		set_target_properties(${UNIT_TEST} PROPERTIES LINK_FLAGS_DEBUG "/SUBSYSTEM:CONSOLE")
+		set_target_properties(${UNIT_TEST} PROPERTIES COMPILE_DEFINITIONS_DEBUG "_CONSOLE")
+		set_target_properties(${UNIT_TEST} PROPERTIES LINK_FLAGS_RELWITHDEBINFO "/SUBSYSTEM:CONSOLE")
+		set_target_properties(${UNIT_TEST} PROPERTIES COMPILE_DEFINITIONS_RELWITHDEBINFO "_CONSOLE")
+		set_target_properties(${UNIT_TEST} PROPERTIES LINK_FLAGS_RELEASE "/SUBSYSTEM:CONSOLE")
+		set_target_properties(${UNIT_TEST} PROPERTIES LINK_FLAGS_MINSIZEREL "/SUBSYSTEM:CONSOLE")
+	endif(WIN32)
 
-add_test(NAME "test" COMMAND carteracoretest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+	target_include_directories(${UNIT_TEST}
+		PRIVATE ${Boost_INCLUDE_DIR}
+		PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../
+	)
+	target_link_libraries(${UNIT_TEST} carteracore ${Boost_LIBRARIES})
+
+	add_test(NAME "${TEST_DESC}" COMMAND jsonparser.t WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+endforeach()
+

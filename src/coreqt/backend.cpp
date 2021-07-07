@@ -38,6 +38,7 @@ void Backend::hello() const
 
 void Backend::searchSymbols(const QString& keyword, const QJSValue& callback) const
 {
+    /* FIXME
     using ResultType = QVector<FinancialInstrument>;
 
     auto* watcher = new QFutureWatcher<ResultType>(this->parent());
@@ -55,6 +56,7 @@ void Backend::searchSymbols(const QString& keyword, const QJSValue& callback) co
             return ResultType{ res.begin(), res.end() };
             })
     );
+    */
 }
 
 void Backend::getQuote(const QString& symbol, const QJSValue& callback) const
