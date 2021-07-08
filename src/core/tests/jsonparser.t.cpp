@@ -76,16 +76,16 @@ BOOST_AUTO_TEST_CASE(parse_quote_IBM)
     const auto result = yahoo_parser::parse_quote(read_file(json_filepath));
 
     BOOST_CHECK_EQUAL(result.symbol, "IBM");
-    BOOST_CHECK_EQUAL(result.current_price, 136.38);
-    BOOST_CHECK_EQUAL(result.day_high_price, 136.48);
-    BOOST_CHECK_EQUAL(result.day_low_price, 133.12);
-    BOOST_CHECK_EQUAL(result.day_open_price, 133.29);
+    BOOST_CHECK_CLOSE(result.current_price, 136.38, 1e-8);
+    BOOST_CHECK_CLOSE(result.day_high_price, 136.48, 1e-8);
+    BOOST_CHECK_CLOSE(result.day_low_price, 133.12, 1e-8);
+    BOOST_CHECK_CLOSE(result.day_open_price, 133.29, 1e-8);
     BOOST_CHECK(result.is_market_open);
     BOOST_CHECK(result.market_cap.has_value());
     if (result.market_cap.has_value()) {
         BOOST_CHECK_EQUAL(result.market_cap.value(), double(121868353536));
     }
-    BOOST_CHECK_EQUAL(result.prev_day_close_price, 133.07);
+    BOOST_CHECK_CLOSE(result.prev_day_close_price, 133.07, 1e-8);
     BOOST_CHECK_EQUAL(result.volume, 5567592);
     BOOST_CHECK_EQUAL(result.updated_time.time_since_epoch().count(), 1616788802);
 }
@@ -96,16 +96,16 @@ BOOST_AUTO_TEST_CASE(parse_quote_ETH_USD)
     const auto result = yahoo_parser::parse_quote(read_file(json_filepath));
 
     BOOST_CHECK_EQUAL(result.symbol, "ETH-USD");
-    BOOST_CHECK_EQUAL(result.current_price, 2358.923);
-    BOOST_CHECK_EQUAL(result.day_high_price, 2396.8665);
-    BOOST_CHECK_EQUAL(result.day_low_price, 2298.4412);
-    BOOST_CHECK_EQUAL(result.day_open_price, 2317.4314);
+    BOOST_CHECK_CLOSE(result.current_price, 2358.923, 1e-8);
+    BOOST_CHECK_CLOSE(result.day_high_price, 2396.8665, 1e-8);
+    BOOST_CHECK_CLOSE(result.day_low_price, 2298.4412, 1e-8);
+    BOOST_CHECK_CLOSE(result.day_open_price, 2317.4314, 1e-8);
     BOOST_CHECK(result.is_market_open);
     BOOST_CHECK(result.market_cap.has_value());
     if (result.market_cap.has_value()) {
         BOOST_CHECK_EQUAL(result.market_cap.value(), double(275044761600));
     }
-    BOOST_CHECK_EQUAL(result.prev_day_close_price, 2317.4314);
+    BOOST_CHECK_CLOSE(result.prev_day_close_price, 2317.4314, 1e-8);
     BOOST_CHECK_EQUAL(result.volume, 23386800128);
     BOOST_CHECK_EQUAL(result.updated_time.time_since_epoch().count(), 1625680262);
 }
@@ -127,15 +127,15 @@ BOOST_AUTO_TEST_CASE(parse_quote_BTCUSDT_Binance)
     const std::string json_filepath{ "./fixture/BTCUSDT_24hr.json" };
     const auto result = binance_parser::parse_quote(read_file(json_filepath));
 
-    BOOST_CHECK_EQUAL(result.current_price, 34617.7);
-    BOOST_CHECK_EQUAL(result.day_high_price, 35059.09);
-    BOOST_CHECK_EQUAL(result.day_low_price, 33532.0);
-    BOOST_CHECK_EQUAL(result.day_open_price, 34112.66);
+    BOOST_CHECK_CLOSE(result.current_price, 34617.7, 1e-8);
+    BOOST_CHECK_CLOSE(result.day_high_price, 35059.09, 1e-8);
+    BOOST_CHECK_CLOSE(result.day_low_price, 33532.0, 1e-8);
+    BOOST_CHECK_CLOSE(result.day_open_price, 34112.66, 1e-8);
     BOOST_CHECK(result.is_market_open);
     BOOST_CHECK(!result.market_cap.has_value());
-    BOOST_CHECK_EQUAL(result.prev_day_close_price, 34110.19);
+    BOOST_CHECK_CLOSE(result.prev_day_close_price, 34110.19, 1e-8);
     BOOST_CHECK_EQUAL(result.symbol, "BTCUSDT");
-    BOOST_CHECK_EQUAL(result.volume, 53496.190443);
+    BOOST_CHECK_CLOSE(result.volume, 53496.190443, 1e-8);
 }
 
 BOOST_AUTO_TEST_CASE(parse_search_quote_exchange_info_Binance)
