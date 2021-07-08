@@ -18,7 +18,6 @@
 #include "client.h"
 #include "types/exceptions.h"
 
-#include <memory>
 #include <cpr/cpr.h>
 
 namespace cartera {
@@ -49,24 +48,6 @@ std::string simple_http_client::get(const std::string& url) const
         cpr::Timeout{CARTERACORE_HTTP_CLIENT_TIMEOUT}
     );
     return extract_response(r);
-}
-
-std::future<std::string> simple_http_client::get_future(const std::string& url) const
-{
-    auto response_text_p = std::make_shared<std::promise<std::string>>();
-    const auto fut = cpr::GetCallback(
-        [response_text_p](const cpr::Response& r) {
-            try {
-                response_text_p->set_value(extract_response(r));
-            }
-            catch (...) {
-                response_text_p->set_exception(std::current_exception());
-            }
-        },
-        cpr::Url{ url },
-        cpr::Timeout{ CARTERACORE_HTTP_CLIENT_TIMEOUT }
-    );
-    return response_text_p->get_future();
 }
 
 }

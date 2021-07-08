@@ -18,7 +18,6 @@
 
 #ifndef CARTERA_HTTP_CLIENT_H
 #define CARTERA_HTTP_CLIENT_H
-#include <future>
 #include <string>
 
 #ifndef CARTERACORE_HTTP_CLIENT_TIMEOUT
@@ -35,8 +34,6 @@ public:
     virtual ~simple_http_client();
 
     std::string get(const std::string& url) const;
-
-    std::future<std::string> get_future(const std::string& url) const;
 };
 
 }
