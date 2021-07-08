@@ -54,9 +54,8 @@ void Backend::searchSymbols(const QString& keyword, const QJSValue& callback) co
     );
 }
 
-void Backend::getQuote(const QString& symbol, const QJSValue& callback) const
+void Backend::getQuote(const QString& symbol, int source, const QJSValue& callback) const
 {
-    /*FIXME
     auto* watcher = new QFutureWatcher<Quote>(this->parent());
     connect(watcher, &QFutureWatcher<Quote>::finished, [this, watcher, callback]() {
         QJSValue cb(callback);
@@ -64,10 +63,10 @@ void Backend::getQuote(const QString& symbol, const QJSValue& callback) const
         watcher->deleteLater();
         });
     watcher->setFuture(
-        QtConcurrent::run([symbol, this]() {
-            return Quote{ basic_feed::resolve_quote<feed_source::YahooFinance>(m_httpClient, symbol.toStdString()) };
+        QtConcurrent::run([symbol, source, this]() -> Quote {
+            return m_feedApi.get_quote(symbol.toStdString(), static_cast<feed_source>(source));
         })
-    );*/
+    );
 }
 
 }  // close cartera namespace

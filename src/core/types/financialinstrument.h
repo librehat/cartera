@@ -42,6 +42,7 @@ enum class asset_class
     CryptoCurrency,
     Option,
 
+    // New asset class should only be added right before k_END
     k_END,
 };
 std::ostream& operator<<(std::ostream& os, const asset_class& rhs);

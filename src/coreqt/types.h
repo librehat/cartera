@@ -18,9 +18,18 @@
 #ifndef CARTERA_COREQT_TYPES_H
 #define CARTERA_COREQT_TYPES_H
 
+#include <QObject>
+#include <qdatetime.h>
+#include <qvariant.h>
+
+#include "types/financialinstrument.h"
+
 #define STL_STRING_PROP_IMPL(READ_FUNC, MEM_NAME) \
     inline QString READ_FUNC() const { return QString::fromStdString( MEM_NAME ); }
-    
+
+#define ENUM_CLASS_PROP_IMPL(READ_FUNC, MEM_NAME) \
+    inline int READ_FUNC() const { return static_cast<int>( MEM_NAME ); }
+
 #define GADGET_BOILER_PLATE_DECL(CLASS, BASE) \
 public: \
     CLASS() = default; \
@@ -30,29 +39,23 @@ public: \
     CLASS(const BASE& data); \
     CLASS& operator=(const CLASS& rhs) noexcept; \
     CLASS& operator=(CLASS&& rhs) noexcept; \
-private:
-
-#include <QObject>
-
-#include "types/financialinstrument.h"
 
 namespace cartera {
-    
+ 
 class SymbolSearchResult : public symbol_search_result {
     Q_GADGET
 
-    //TODO: asset_class not able to be registered
-    // Q_PROPERTY(asset_class type MEMBER type)
+    Q_PROPERTY(int type READ getType)
     Q_PROPERTY(QString symbol READ getSymbol)
-    //TODO: feed_source not able to be registered
-    // Q_PROPERTY(feed_source source MEMBER source)
+    Q_PROPERTY(int source READ getSource)
     Q_PROPERTY(QString exchangeCode READ getExchangeCode)
     Q_PROPERTY(QString name READ getName)
     
     GADGET_BOILER_PLATE_DECL(SymbolSearchResult, symbol_search_result)
     
-public:
+    ENUM_CLASS_PROP_IMPL(getType, type)
     STL_STRING_PROP_IMPL(getSymbol, symbol)
+    ENUM_CLASS_PROP_IMPL(getSource, source)
     STL_STRING_PROP_IMPL(getExchangeCode, exchange_code)
     STL_STRING_PROP_IMPL(getName, name)
 };
@@ -60,8 +63,7 @@ public:
 class FinancialInstrument : public financial_instrument {
     Q_GADGET
 
-    //TODO: asset_class not able to be registered
-    // Q_PROPERTY(asset_class type MEMBER type)
+    Q_PROPERTY(int type READ getType)
     Q_PROPERTY(QString symbol READ getSymbol)
     Q_PROPERTY(QString currency READ getCurrency)
     Q_PROPERTY(QString exchangeNode READ getExchangeCode)
@@ -70,7 +72,7 @@ class FinancialInstrument : public financial_instrument {
 
     GADGET_BOILER_PLATE_DECL(FinancialInstrument, financial_instrument)
     
-public:
+    ENUM_CLASS_PROP_IMPL(getType, type)
     STL_STRING_PROP_IMPL(getSymbol, symbol)
     STL_STRING_PROP_IMPL(getCurrency, currency)
     STL_STRING_PROP_IMPL(getExchangeCode, exchange_code)
@@ -82,7 +84,7 @@ public:
 class Quote : public quote {
     Q_GADGET
     
-    // TODO: datetime updated_time
+    Q_PROPERTY(QDateTime updatedTime READ getUpdatedTime)
     Q_PROPERTY(QString symbol READ getSymbol)
     Q_PROPERTY(double dayLowPrice MEMBER day_low_price)
     Q_PROPERTY(double dayHighPrice MEMBER day_high_price)
@@ -91,12 +93,27 @@ class Quote : public quote {
     Q_PROPERTY(double currentPrice MEMBER current_price)
     Q_PROPERTY(double volume MEMBER volume)
     Q_PROPERTY(double isMarketOpen MEMBER is_market_open)
-    // TODO: optional<double> market_cap
+    Q_PROPERTY(QVariant marketCap READ getMarketCap)
 
     GADGET_BOILER_PLATE_DECL(Quote, quote)
 
-public:
     STL_STRING_PROP_IMPL(getSymbol, symbol)
+
+    inline QDateTime getUpdatedTime() const {
+        return QDateTime::fromMSecsSinceEpoch(
+            std::chrono::duration_cast<std::chrono::milliseconds>(
+                updated_time.time_since_epoch()
+            ).count()
+        );
+    }
+
+    inline QVariant getMarketCap() const {
+        QVariant res;
+        if (market_cap.has_value()) {
+            res.setValue(market_cap.value());
+        }
+        return res;
+    }
 };
 
 
@@ -106,5 +123,6 @@ Q_DECLARE_METATYPE(cartera::FinancialInstrument)
 Q_DECLARE_METATYPE(cartera::Quote)
 
 #undef STL_STRING_PROP_IMPL
+#undef ENUM_CLASS_PROP_IMPL
 #undef GADGET_BOILER_PLATE_DECL
 #endif  // CARTERA_COREQT_TYPES_H

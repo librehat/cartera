@@ -39,7 +39,7 @@ public:
     Q_INVOKABLE void searchSymbols(const QString& keyword, const QJSValue& callback) const;
 
     // The callback must take a single parameter of type Quote
-    Q_INVOKABLE void getQuote(const QString& symbol, const QJSValue& callback) const;
+    Q_INVOKABLE void getQuote(const QString& symbol, int source, const QJSValue& callback) const;
 
 private:
     feed::api m_feedApi;

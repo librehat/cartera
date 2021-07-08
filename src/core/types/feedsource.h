@@ -26,6 +26,7 @@ enum class feed_source {
 
     Binance,
 
+    // New source should only be added right before k_END
     k_END,
 };
 std::ostream& operator<<(std::ostream& os, const feed_source& rhs);

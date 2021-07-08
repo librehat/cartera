@@ -115,7 +115,7 @@ quote json_parser<feed_source::YahooFinance>::parse_quote(const std::string& dat
     const json::value& market_volume = quote_result.at("regularMarketVolume").at("raw");
 
     return quote{
-        datetime(datetime::clock::duration(epoch_s)),
+        datetime(std::chrono::seconds(epoch_s)),
         quote_result.at("symbol").as_string().data(),
         json_value_as_double(quote_result.at("regularMarketDayLow").at("raw")),
         json_value_as_double(quote_result.at("regularMarketDayHigh").at("raw")),
@@ -176,7 +176,7 @@ quote json_parser<feed_source::Binance>::parse_quote(const std::string& data)
     const json::value document = json::parse(data);
 
     return quote{
-        datetime::clock::now(),
+        datetime::clock::now(),  // FIXME: is this even true? no delayed pricing?
         document.at("symbol").as_string().data(),
         json_value_as_double(document.at("lowPrice")),
         json_value_as_double(document.at("highPrice")),
@@ -184,7 +184,7 @@ quote json_parser<feed_source::Binance>::parse_quote(const std::string& data)
         json_value_as_double(document.at("prevClosePrice")),
         json_value_as_double(document.at("lastPrice")),
         json_value_as_double(document.at("volume")),
-        true, // FIXME
+        true, // cryptocurrency is traded 24*7
         std::optional<double>(),
     };
 }

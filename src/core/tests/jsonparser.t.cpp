@@ -87,7 +87,7 @@ BOOST_AUTO_TEST_CASE(parse_quote_IBM)
     }
     BOOST_CHECK_CLOSE(result.prev_day_close_price, 133.07, 1e-8);
     BOOST_CHECK_EQUAL(result.volume, 5567592);
-    BOOST_CHECK_EQUAL(result.updated_time.time_since_epoch().count(), 1616788802);
+    BOOST_CHECK_EQUAL(std::chrono::duration_cast<std::chrono::seconds>(result.updated_time.time_since_epoch()).count(), 1616788802);
 }
 
 BOOST_AUTO_TEST_CASE(parse_quote_ETH_USD)
@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_CASE(parse_quote_ETH_USD)
     }
     BOOST_CHECK_CLOSE(result.prev_day_close_price, 2317.4314, 1e-8);
     BOOST_CHECK_EQUAL(result.volume, 23386800128);
-    BOOST_CHECK_EQUAL(result.updated_time.time_since_epoch().count(), 1625680262);
+    BOOST_CHECK_EQUAL(std::chrono::duration_cast<std::chrono::seconds>(result.updated_time.time_since_epoch()).count(), 1625680262);
 }
 
 BOOST_AUTO_TEST_CASE(parse_financial_instrument_ETHUSDT_Binance)
