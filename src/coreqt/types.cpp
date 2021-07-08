@@ -17,36 +17,26 @@
 
 #include "types.h"
 
+#define GADGET_BOILER_PLATE_IMPL(CLASS, BASE) \
+CLASS::CLASS(BASE&& data) : BASE(std::move(data)) {} \
+CLASS::CLASS(const BASE& data) : BASE(data) {} \
+CLASS& CLASS::operator=(const CLASS& rhs) noexcept { \
+    dynamic_cast<BASE*>(this)->operator=(dynamic_cast<const BASE&>(rhs)); \
+    return *this; \
+} \
+CLASS& CLASS::operator=(CLASS&& rhs) noexcept { \
+    dynamic_cast<BASE*>(this)->operator=(dynamic_cast<BASE&&>(std::move(rhs))); \
+    return *this; \
+}
+
+
 namespace cartera {
-FinancialInstrument::FinancialInstrument(financial_instrument&& data) : financial_instrument(std::move(data)) {}
-FinancialInstrument::FinancialInstrument(const financial_instrument& data) : financial_instrument(data) {}
 
-FinancialInstrument& FinancialInstrument::operator=(const FinancialInstrument& rhs) noexcept
-{
-    dynamic_cast<financial_instrument*>(this)->operator=(dynamic_cast<const financial_instrument&>(rhs));
-    return *this;
-}
-
-FinancialInstrument& FinancialInstrument::operator=(FinancialInstrument&& rhs) noexcept
-{
-    dynamic_cast<financial_instrument*>(this)->operator=(dynamic_cast<financial_instrument&&>(std::move(rhs)));
-    return *this;
-}
-
-
-Quote::Quote(const quote& data) : quote(data) {}
-Quote::Quote(quote&& data) : quote(std::move(data)) {}
-
-Quote& Quote::operator=(const Quote& rhs) noexcept
-{
-    dynamic_cast<quote*>(this)->operator=(dynamic_cast<const quote&>(rhs));
-    return *this;
-}
-
-Quote& Quote::operator=(Quote&& rhs) noexcept
-{
-    dynamic_cast<quote*>(this)->operator=(dynamic_cast<quote&&>(std::move(rhs)));
-    return *this;
-}
+GADGET_BOILER_PLATE_IMPL(SymbolSearchResult, symbol_search_result)
+GADGET_BOILER_PLATE_IMPL(FinancialInstrument, financial_instrument)
+GADGET_BOILER_PLATE_IMPL(Quote, quote)
 
 }  // close cartera namespace
+
+
+#undef GADGET_BOILER_PLATE_IMPL

@@ -27,8 +27,9 @@
 
 namespace cartera {
 
-Backend::Backend(QObject* parent)
+Backend::Backend(QJSEngine* engine, QObject* parent)
     : QObject(parent)
+    , m_jsEngine(engine)
 {}
 
 void Backend::hello() const
@@ -64,14 +65,12 @@ void Backend::getQuote(const QString& symbol, const QJSValue& callback) const
     auto* watcher = new QFutureWatcher<Quote>(this->parent());
     connect(watcher, &QFutureWatcher<Quote>::finished, [this, watcher, callback]() {
         QJSValue cb(callback);
-        // FIXME: QJSValue::engine() is deprecated but there is no replacement
-        // Using a newly instantiated QJSEngine would trigger an exception when invoking the callback
-        cb.call(QJSValueList{ callback.engine()->toScriptValue(watcher->result()) });
+        cb.call(QJSValueList{ m_jsEngine->toScriptValue(watcher->result()) });
         watcher->deleteLater();
         });
     watcher->setFuture(
         QtConcurrent::run([symbol, this]() {
-            return Quote{ basic_feed::resolve_quote<feed_source::YahooFinance>(m_http_client, symbol.toStdString()) };
+            return Quote{ basic_feed::resolve_quote<feed_source::YahooFinance>(m_httpClient, symbol.toStdString()) };
             })
     );
 }

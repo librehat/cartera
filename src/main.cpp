@@ -21,8 +21,8 @@ int main(int argc, char *argv[])
         1,
         0,
         "Backend",
-        [](QQmlEngine *engine, QJSEngine *) -> QObject* {
-            return new cartera::Backend(engine);
+        [](QQmlEngine *engine, QJSEngine *jsEngine) -> QObject* {
+            return new cartera::Backend(jsEngine, engine);
         });
 
     engine.rootContext()->setContextObject(new KLocalizedContext(&engine));

@@ -20,12 +20,42 @@
 
 #define STL_STRING_PROP_IMPL(READ_FUNC, MEM_NAME) \
     inline QString READ_FUNC() const { return QString::fromStdString( MEM_NAME ); }
+    
+#define GADGET_BOILER_PLATE_DECL(CLASS, BASE) \
+public: \
+    CLASS() = default; \
+    CLASS(const CLASS&) = default; \
+    CLASS(CLASS&&) = default; \
+    CLASS(BASE&& data); \
+    CLASS(const BASE& data); \
+    CLASS& operator=(const CLASS& rhs) noexcept; \
+    CLASS& operator=(CLASS&& rhs) noexcept; \
+private:
 
 #include <QObject>
 
 #include "types/financialinstrument.h"
 
 namespace cartera {
+    
+class SymbolSearchResult : public symbol_search_result {
+    Q_GADGET
+
+    //TODO: asset_class not able to be registered
+    // Q_PROPERTY(asset_class type MEMBER type)
+    Q_PROPERTY(QString symbol READ getSymbol)
+    //TODO: feed_source not able to be registered
+    // Q_PROPERTY(feed_source source MEMBER source)
+    Q_PROPERTY(QString exchangeCode READ getExchangeCode)
+    Q_PROPERTY(QString name READ getName)
+    
+    GADGET_BOILER_PLATE_DECL(SymbolSearchResult, symbol_search_result)
+    
+public:
+    STL_STRING_PROP_IMPL(getSymbol, symbol)
+    STL_STRING_PROP_IMPL(getExchangeCode, exchange_code)
+    STL_STRING_PROP_IMPL(getName, name)
+};
 
 class FinancialInstrument : public financial_instrument {
     Q_GADGET
@@ -38,17 +68,9 @@ class FinancialInstrument : public financial_instrument {
     Q_PROPERTY(QString shortName READ getShortName)
     Q_PROPERTY(QString longName READ getLongName)
 
+    GADGET_BOILER_PLATE_DECL(FinancialInstrument, financial_instrument)
+    
 public:
-    FinancialInstrument() = default;
-    FinancialInstrument(const FinancialInstrument&) = default;
-    FinancialInstrument(FinancialInstrument&&) = default;
-
-    FinancialInstrument(financial_instrument&& data);
-    FinancialInstrument(const financial_instrument& data);
-
-    FinancialInstrument& operator=(const FinancialInstrument& rhs) noexcept;
-    FinancialInstrument& operator=(FinancialInstrument&& rhs) noexcept;
-
     STL_STRING_PROP_IMPL(getSymbol, symbol)
     STL_STRING_PROP_IMPL(getCurrency, currency)
     STL_STRING_PROP_IMPL(getExchangeCode, exchange_code)
@@ -71,17 +93,9 @@ class Quote : public quote {
     Q_PROPERTY(double isMarketOpen MEMBER is_market_open)
     // TODO: optional<double> market_cap
 
+    GADGET_BOILER_PLATE_DECL(Quote, quote)
+
 public:
-    Quote() = default;
-    Quote(const Quote&) = default;
-    Quote(Quote&&) = default;
-
-    Quote(const quote&);
-    Quote(quote&&);
-
-    Quote& operator=(const Quote& rhs) noexcept;
-    Quote& operator=(Quote&& rhs) noexcept;
-
     STL_STRING_PROP_IMPL(getSymbol, symbol)
 };
 
@@ -92,4 +106,5 @@ Q_DECLARE_METATYPE(cartera::FinancialInstrument)
 Q_DECLARE_METATYPE(cartera::Quote)
 
 #undef STL_STRING_PROP_IMPL
+#undef GADGET_BOILER_PLATE_DECL
 #endif  // CARTERA_COREQT_TYPES_H

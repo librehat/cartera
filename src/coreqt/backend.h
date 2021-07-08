@@ -33,7 +33,7 @@ class Backend : public QObject {
 Q_OBJECT
 
 public:
-    explicit Backend(QObject* parent = nullptr);
+    explicit Backend (QJSEngine* engine, QObject* parent = nullptr);
 
     Q_INVOKABLE void hello() const;
 
@@ -44,7 +44,8 @@ public:
     Q_INVOKABLE void getQuote(const QString& symbol, const QJSValue& callback) const;
 
 private:
-    simple_http_client m_http_client;
+    simple_http_client m_httpClient;
+    QJSEngine* m_jsEngine;
 };
 
 }  // close cartera namespace
