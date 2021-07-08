@@ -15,10 +15,15 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationDomain("librehat.com");
     QCoreApplication::setApplicationName("Cartera");
 
-    QScopedPointer<cartera::Backend> backend(new cartera::Backend());
-
     QQmlApplicationEngine engine;
-    qmlRegisterSingletonInstance("com.librehat.cartera", 1, 0, "Backend", backend.get());
+    qmlRegisterSingletonType<cartera::Backend>(
+        "com.librehat.cartera",
+        1,
+        0,
+        "Backend",
+        [](QQmlEngine *engine, QJSEngine *) -> QObject* {
+            return new cartera::Backend(engine);
+        });
 
     engine.rootContext()->setContextObject(new KLocalizedContext(&engine));
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
