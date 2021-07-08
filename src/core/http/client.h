@@ -18,12 +18,23 @@
 
 #ifndef CARTERA_HTTP_CLIENT_H
 #define CARTERA_HTTP_CLIENT_H
+
 #include <string>
 
 #ifndef CARTERACORE_HTTP_CLIENT_TIMEOUT
 // The default timeout would be 60s
 #define CARTERACORE_HTTP_CLIENT_TIMEOUT 60000
 #endif
+
+// Forward declare the context class to keep boost private
+namespace boost {
+namespace asio {
+namespace ssl {
+class context;
+}  // close ssl namespace
+class io_context;
+}  // close asio namespace
+}  // close boost namespace
 
 namespace cartera {
 
@@ -34,8 +45,12 @@ public:
     virtual ~simple_http_client();
 
     std::string get(const std::string& url) const;
+
+protected:
+    boost::asio::io_context* m_io_ctx;
+    boost::asio::ssl::context* m_ssl_ctx;
 };
 
-}
+}  // close cartera namespace
 
 #endif
