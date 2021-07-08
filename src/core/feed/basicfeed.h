@@ -90,9 +90,10 @@ struct urls<feed_source::Binance> {
         return "https://api.binance.com/api/v3/ticker/24hr?symbol=" + symbol;
     }
 
-    static std::string search(const std::string&)
+    static const std::string& search(const std::string&)
     {
-        return "";  // TODO
+        static const std::string url{ "https://api.binance.com/api/v3/exchangeInfo" };
+        return url;
     }
 };
 

@@ -59,5 +59,8 @@ BOOST_AUTO_TEST_CASE(basic_feed_binance_quote)
 BOOST_AUTO_TEST_CASE(basic_feed_binance_search)
 {
     const auto res = basic_feed::search_symbols<feed_source::Binance>(client, "DOGE");
-    BOOST_CHECK_EQUAL(0, res.size());  //TODO
+    BOOST_CHECK_GT(res.size(), 0);
+    BOOST_CHECK_EQUAL(res[0].symbol.find("DOGE"), 0);
+    BOOST_CHECK_EQUAL(res[0].type, cartera::asset_class::CryptoCurrency);
+    BOOST_CHECK_EQUAL(res[0].source, feed_source::Binance);
 }

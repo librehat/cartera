@@ -137,3 +137,19 @@ BOOST_AUTO_TEST_CASE(parse_quote_BTCUSDT_Binance)
     BOOST_CHECK_EQUAL(result.symbol, "BTCUSDT");
     BOOST_CHECK_EQUAL(result.volume, 53496.190443);
 }
+
+BOOST_AUTO_TEST_CASE(parse_search_quote_exchange_info_Binance)
+{
+    const std::string json_filepath{ "./fixture/exchangeInfo.json" };
+    const auto result = binance_parser::parse_search_quote(read_file(json_filepath));
+
+    BOOST_CHECK_EQUAL(result.size(), 1539);
+    BOOST_CHECK_EQUAL(result[0].symbol, "ETHBTC");
+    BOOST_CHECK_EQUAL(result[0].name, "ETH/BTC");
+    BOOST_CHECK_EQUAL(result[0].type, cartera::asset_class::CryptoCurrency);
+    BOOST_CHECK_EQUAL(result[0].source, cartera::feed_source::Binance);
+    BOOST_CHECK_EQUAL(result[1].symbol, "LTCBTC");
+    BOOST_CHECK_EQUAL(result[1].name, "LTC/BTC");
+    BOOST_CHECK_EQUAL(result[1].type, cartera::asset_class::CryptoCurrency);
+    BOOST_CHECK_EQUAL(result[1].source, cartera::feed_source::Binance);
+}

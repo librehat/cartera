@@ -191,8 +191,24 @@ quote json_parser<feed_source::Binance>::parse_quote(const std::string& data)
 
 std::vector<symbol_search_result> json_parser<feed_source::Binance>::parse_search_quote(const std::string& data)
 {
-    // TODO
-    return {};
+    const json::value document = json::parse(data);
+    const json::array& symbols = document.at("symbols").as_array();
+
+    std::vector<symbol_search_result> results{};
+    for (const auto& symbol : symbols) {
+        std::ostringstream oss;
+        oss << symbol.at("baseAsset").as_string().data() << "/" << symbol.at("quoteAsset").as_string().data();
+        results.emplace_back(
+            symbol_search_result{
+                asset_class::CryptoCurrency,
+                symbol.at("symbol").as_string().data(),
+                feed_source::Binance,
+                {"BIN"}, // FIXME, a proper exchange code for Binance
+                oss.str(),
+            }
+        );
+    }
+    return results;
 }
 
 }  // close cartera namespace
