@@ -32,32 +32,27 @@ Backend::Backend(QJSEngine* engine, QObject* parent)
     , m_jsEngine(engine)
 {}
 
-void Backend::hello() const
-{
-    qDebug() << "Hello from backend";
-}
-
 void Backend::searchSymbols(const QString& keyword, const QJSValue& callback) const
 {
-    /* FIXME
-    using ResultType = QVector<FinancialInstrument>;
+    using ResultType = QVector<SymbolSearchResult>;
 
     auto* watcher = new QFutureWatcher<ResultType>(this->parent());
     connect(watcher, &QFutureWatcher<ResultType>::finished, [this, watcher, callback]() {
         QJSValue cb(callback);
-        // FIXME: QJSValue::engine() is deprecated but there is no replacement
-        // Using a newly instantiated QJSEngine would trigger an exception when invoking the callback
-        cb.call(QJSValueList{ callback.engine()->toScriptValue(watcher->result()) });
+        cb.call(QJSValueList{ m_jsEngine->toScriptValue(watcher->result()) });
         watcher->deleteLater();
         });
     watcher->setFuture(
         // capture by value, the lifespan of &keyword is shorter than the lambda
-        QtConcurrent::run([keyword, this]() {
-            auto res = basic_feed<feed_source::YahooFinance>::search_symbols(m_http_client, keyword.toStdString());
-            return ResultType{ res.begin(), res.end() };
-            })
+        QtConcurrent::run([keyword, this]() -> ResultType {
+            auto res = basic_feed::search_symbols<feed_source::YahooFinance>(m_httpClient, keyword.toStdString());
+            ResultType out;
+            for (auto&& item : res) {
+                out.push_back(std::move(item));
+            }
+            return out;
+        })
     );
-    */
 }
 
 void Backend::getQuote(const QString& symbol, const QJSValue& callback) const
@@ -71,7 +66,7 @@ void Backend::getQuote(const QString& symbol, const QJSValue& callback) const
     watcher->setFuture(
         QtConcurrent::run([symbol, this]() {
             return Quote{ basic_feed::resolve_quote<feed_source::YahooFinance>(m_httpClient, symbol.toStdString()) };
-            })
+        })
     );
 }
 

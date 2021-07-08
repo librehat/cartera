@@ -35,8 +35,6 @@ Q_OBJECT
 public:
     explicit Backend (QJSEngine* engine, QObject* parent = nullptr);
 
-    Q_INVOKABLE void hello() const;
-
     //The callback must take a single parameter of type QVector<FinancialInstrument>
     Q_INVOKABLE void searchSymbols(const QString& keyword, const QJSValue& callback) const;
 
