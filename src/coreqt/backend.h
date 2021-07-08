@@ -20,7 +20,7 @@
 #include <QObject>
 #include <QJSValue>
 
-#include "http/client.h"
+#include "feed/api.h"
 
 namespace cartera {
 
@@ -42,7 +42,7 @@ public:
     Q_INVOKABLE void getQuote(const QString& symbol, const QJSValue& callback) const;
 
 private:
-    simple_http_client m_httpClient;
+    feed::api m_feedApi;
     QJSEngine* m_jsEngine;
 };
 

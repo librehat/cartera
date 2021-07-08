@@ -25,6 +25,7 @@
 #include "parser/jsonparser.h"
 
 namespace cartera {
+namespace feed {
 
 namespace details {
 template<feed_source SOURCE>
@@ -34,21 +35,21 @@ struct urls {};
 struct basic_feed
 {
     template<feed_source SOURCE>
-    static financial_instrument resolve_symbol(const simple_http_client& client, const std::string& symbol)
+    static financial_instrument resolve_symbol(const simple_http_client& client, const std::string_view& symbol)
     {
         const std::string resp = client.get(details::urls<SOURCE>::symbol(symbol));
         return json_parser<SOURCE>::parse_financial_instrument(resp);
     }
 
     template<feed_source SOURCE>
-    static quote resolve_quote(const simple_http_client& client, const std::string& symbol)
+    static quote resolve_quote(const simple_http_client& client, const std::string_view& symbol)
     {
         const std::string resp = client.get(details::urls<SOURCE>::quote(symbol));
         return json_parser<SOURCE>::parse_quote(resp);
     }
 
     template<feed_source SOURCE>
-    static std::vector<symbol_search_result> search_symbols(const simple_http_client& client, const std::string& keyword)
+    static std::vector<symbol_search_result> search_symbols(const simple_http_client& client, const std::string_view& keyword)
     {
         const std::string resp = client.get(details::urls<SOURCE>::search(keyword));
         return json_parser<SOURCE>::parse_search_quote(resp);
@@ -56,41 +57,41 @@ struct basic_feed
 };
 
 template<>
-std::vector<symbol_search_result> basic_feed::search_symbols<feed_source::Binance>(const simple_http_client& client, const std::string& keyword);
+std::vector<symbol_search_result> basic_feed::search_symbols<feed_source::Binance>(const simple_http_client& client, const std::string_view& keyword);
 
 
 namespace details {
 template<>
 struct urls<feed_source::YahooFinance> {
-    static std::string symbol(const std::string& symbol)
+    static std::string symbol(const std::string_view& symbol)
     {
-        return "https://query1.finance.yahoo.com/v10/finance/quoteSummary/" + symbol + "?modules=price";
+        return "https://query1.finance.yahoo.com/v10/finance/quoteSummary/" + std::string{ symbol } + "?modules=price";
     }
-    
-    static std::string quote(const std::string& symbol)
+
+    static std::string quote(const std::string_view& symbol)
     {
         return urls::symbol(symbol);
     }
-    
-    static std::string search(const std::string& keyword)
+
+    static std::string search(const std::string_view& keyword)
     {
-        return "https://query2.finance.yahoo.com/v1/finance/search?q=" + keyword + "&quotesCount=10&newsCount=0";
+        return "https://query2.finance.yahoo.com/v1/finance/search?q=" + std::string{ keyword } + "&quotesCount=10&newsCount=0";
     }
 };
 
 template<>
 struct urls<feed_source::Binance> {
-    static std::string symbol(const std::string& symbol)
+    static std::string symbol(const std::string_view& symbol)
     {
-        return "https://api.binance.com/api/v3/exchangeInfo?symbol=" + symbol;
+        return "https://api.binance.com/api/v3/exchangeInfo?symbol=" + std::string{ symbol };
     }
 
-    static std::string quote(const std::string& symbol)
+    static std::string quote(const std::string_view& symbol)
     {
-        return "https://api.binance.com/api/v3/ticker/24hr?symbol=" + symbol;
+        return "https://api.binance.com/api/v3/ticker/24hr?symbol=" + std::string{ symbol };
     }
 
-    static const std::string& search(const std::string&)
+    static const std::string& search(const std::string_view&)
     {
         static const std::string url{ "https://api.binance.com/api/v3/exchangeInfo" };
         return url;
@@ -99,6 +100,7 @@ struct urls<feed_source::Binance> {
 
 }  // close details namespace 
 
+}  // close feed namespace
 }  // close cartera namespace
 
 #endif // CARTERA_FEED_BASICFEED_H

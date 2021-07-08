@@ -5,6 +5,7 @@
 #include "http/client.h"
 
 using namespace cartera;
+using namespace cartera::feed;
 simple_http_client client;
 
 BOOST_AUTO_TEST_CASE(basic_feed_yahoo_finance_symbol)

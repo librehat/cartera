@@ -24,9 +24,11 @@ std::optional<std::vector<cartera::symbol_search_result>> g_binance_all_symbols;
 std::mutex g_binance_all_symbols_mutex;
 
 namespace cartera {
+namespace feed {
 
 template<>
-std::vector<symbol_search_result> basic_feed::search_symbols<feed_source::Binance>(const simple_http_client& client, const std::string& keyword)
+std::vector<symbol_search_result> basic_feed::search_symbols<feed_source::Binance>(
+    const simple_http_client& client, const std::string_view& keyword)
 {
     // Binance doesn't have search API. We list all known symbols at the exchange and then search it
     // To improve the performance and to not exceed the rate limits, we cache the full list in-memory.
@@ -48,4 +50,5 @@ std::vector<symbol_search_result> basic_feed::search_symbols<feed_source::Binanc
     return results;
 }
 
+}  // close feed namespace
 }  // close cartera namespace

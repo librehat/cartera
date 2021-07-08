@@ -1,5 +1,6 @@
 set(libcarteracore_SRCS
 	"http/client.cpp"
+    "feed/api.cpp"
     "feed/basicfeed.cpp"
     "parser/jsonparser.cpp"
     "types/feedsource.cpp"

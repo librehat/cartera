@@ -19,13 +19,10 @@ Kirigami.ApplicationWindow {
     }
 
     Component.onCompleted: {
-        Backend.searchSymbols("IBM", function(results) {
+        Backend.searchSymbols("ETH", function(results) {
             for (let i in results) {
                 console.log(i, results[i]);
             }
-        });
-        Backend.getQuote("VOD.L", function(quote) {
-            console.log("VOD.L quote", quote);
         });
     }
 }

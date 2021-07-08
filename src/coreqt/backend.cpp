@@ -17,7 +17,6 @@
 #include "backend.h"
 
 #include "types.h"
-#include "feed/basicfeed.h"
 
 #include <algorithm>
 #include <QtConcurrent>
@@ -45,7 +44,7 @@ void Backend::searchSymbols(const QString& keyword, const QJSValue& callback) co
     watcher->setFuture(
         // capture by value, the lifespan of &keyword is shorter than the lambda
         QtConcurrent::run([keyword, this]() -> ResultType {
-            auto res = basic_feed::search_symbols<feed_source::YahooFinance>(m_httpClient, keyword.toStdString());
+            auto res = m_feedApi.search_symbols(keyword.toStdString());
             ResultType out;
             for (auto&& item : res) {
                 out.push_back(std::move(item));
@@ -57,6 +56,7 @@ void Backend::searchSymbols(const QString& keyword, const QJSValue& callback) co
 
 void Backend::getQuote(const QString& symbol, const QJSValue& callback) const
 {
+    /*FIXME
     auto* watcher = new QFutureWatcher<Quote>(this->parent());
     connect(watcher, &QFutureWatcher<Quote>::finished, [this, watcher, callback]() {
         QJSValue cb(callback);
@@ -67,7 +67,7 @@ void Backend::getQuote(const QString& symbol, const QJSValue& callback) const
         QtConcurrent::run([symbol, this]() {
             return Quote{ basic_feed::resolve_quote<feed_source::YahooFinance>(m_httpClient, symbol.toStdString()) };
         })
-    );
+    );*/
 }
 
 }  // close cartera namespace
