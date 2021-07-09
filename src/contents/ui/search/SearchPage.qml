@@ -6,41 +6,62 @@ import org.kde.kirigami 2.10 as Kirigami
 import "/code/backend.js" as Backend
 
 Kirigami.ScrollablePage {
-	id: root
+    id: root
+
+    signal errored(string message)
+    signal confirmed(var symbolIdentifiers)
 
     header: Controls.ToolBar {
-		RowLayout {
-			anchors.fill: parent
-			Controls.TextField {
-				id: searchTextField
-				placeholderText: "Keyword"
-				Layout.fillWidth: true
-			}
-			Controls.ToolButton {
-				text: "Search"
-				onClicked: root.onSearch()
-			}
-		}
-	}
+        RowLayout {
+            anchors.fill: parent
+            Controls.TextField {
+                id: searchTextField
+                placeholderText: "Keyword"
+                Layout.fillWidth: true
+            }
+            Controls.ToolButton {
+                text: "Search"
+                onClicked: root.onSearch()
+            }
+        }
+    }
+    
+    contextualActions: [
+        Kirigami.Action {
+            id: multiSelectAction
+            text: "Multi-Select"
+            checkable: true
+        }
+    ]
 
-	ListView {
-		spacing: Kirigami.Units.smallSpacing
-		model: ListModel { id: searchListModel }
-		delegate: SearchItemDelegate {}
-	}
+    mainAction: Kirigami.Action {
+        text: "Confirm"
 
-	function onSearch() {
-		root.refreshing = true;
-		Backend.searchSymbols(searchTextField.text)
-		.then((results) => {
-			searchListModel.clear();
-			results.forEach((item) => {
-				searchListModel.append(item);
-			});
-		}).catch((error) => {
-			// TODO: handle the error
-		}).then(() => {
-			root.refreshing = false;
-		});
-	}
+        onTriggered: {
+            // TODO
+        }
+    }
+
+    ListView {
+        spacing: Kirigami.Units.smallSpacing
+        model: ListModel { id: searchListModel }
+        delegate: SearchItemDelegate {
+            multiSelectable: multiSelectAction.checked
+        }
+    }
+
+    function onSearch() {
+        root.refreshing = true;
+        Backend.searchSymbols(searchTextField.text)
+        .then((results) => {
+            searchListModel.clear();
+            results.forEach((item) => {
+                searchListModel.append(item);
+            });
+        }).catch((error) => {
+            root.errored(error);
+        }).then(() => {
+            root.refreshing = false;
+        });
+    }
 }

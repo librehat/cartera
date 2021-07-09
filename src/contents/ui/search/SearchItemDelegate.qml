@@ -1,7 +1,19 @@
-import org.kde.kirigami 2.10 as Kirigami
+import QtQuick.Controls 2.12 as Controls
+import org.kde.kirigami 2.15 as Kirigami
 
-// Delegate for SymbolSearchResult type
+
 Kirigami.BasicListItem {
-	label: symbol
-	subtitle: `${name} (${exchangeCode}) (${typeDisp})`
+    property bool multiSelectable: false
+
+    label: symbol
+    subtitle: `${name} (${exchangeCode}) (${typeDisp})`
+
+    leading: Controls.CheckBox {
+        id: checkbox
+        visible: multiSelectable
+    }
+
+    onMultiSelectableChanged: {
+        checkbox.checked = false;
+    }
 }
