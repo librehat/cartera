@@ -18,6 +18,7 @@
 #include "basicfeed.h"
 
 #include <algorithm>
+#include <iterator>
 #include <mutex>
 #include <sstream>
 
