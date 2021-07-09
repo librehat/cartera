@@ -2,6 +2,7 @@
 #include <QQmlApplicationEngine>
 #include <QtQml>
 #include <QUrl>
+#include <QQuickStyle>
 #include <KLocalizedContext>
 #include <KLocalizedString>
 
@@ -14,6 +15,10 @@ int main(int argc, char *argv[])
     KLocalizedString::setApplicationDomain("cartera");
     QCoreApplication::setOrganizationDomain("librehat.com");
     QCoreApplication::setApplicationName("Cartera");
+
+#ifdef Q_OS_WINDOWS
+    QQuickStyle::setStyle("Universal");
+#endif
 
     QQmlApplicationEngine engine;
     qmlRegisterSingletonType<cartera::Backend>(

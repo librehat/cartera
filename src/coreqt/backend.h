@@ -35,11 +35,13 @@ Q_OBJECT
 public:
     explicit Backend (QJSEngine* engine, QObject* parent = nullptr);
 
-    //The callback must take a single parameter of type QVector<FinancialInstrument>
-    Q_INVOKABLE void searchSymbols(const QString& keyword, const QJSValue& callback) const;
+    // The 'callback' must take a single parameter of type QVector<SearchSymbolResult>
+    // The 'errorCb' must take a single parameter of QString that is the error message
+    Q_INVOKABLE void searchSymbols(const QString& keyword, const QJSValue& callback, const QJSValue& errorCb) const;
 
-    // The callback must take a single parameter of type Quote
-    Q_INVOKABLE void getQuote(const QString& symbol, int source, const QJSValue& callback) const;
+    // The 'callback' must take a single parameter of type Quote
+    // The 'errorCb' must take a single parameter of QString that is the error message
+    Q_INVOKABLE void getQuote(const QString& symbol, int source, const QJSValue& callback, const QJSValue& errorCb) const;
 
 private:
     feed::api m_feedApi;

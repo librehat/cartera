@@ -9,7 +9,7 @@ To build `cartera`, a C++ compiler that supports C++17 is required.
  - Boost >= 1.75 (json, system, filesystem)
  - OpenSSL
  - Qt >= 5.12
- - KDE Frameworks 5 >= 5.71 (kirigami2)
+ - KDE Frameworks 5 >= 5.76 (kirigami2, ki18n)
 
 ### Instructions
 Like any CMake-based projects,

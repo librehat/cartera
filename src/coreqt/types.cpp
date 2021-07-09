@@ -17,6 +17,8 @@
 
 #include "types.h"
 
+#include <sstream>
+
 #define GADGET_BOILER_PLATE_IMPL(CLASS, BASE) \
 CLASS::CLASS(BASE&& data) : BASE(std::move(data)) {} \
 CLASS::CLASS(const BASE& data) : BASE(data) {} \
@@ -35,6 +37,14 @@ namespace cartera {
 GADGET_BOILER_PLATE_IMPL(SymbolSearchResult, symbol_search_result)
 GADGET_BOILER_PLATE_IMPL(FinancialInstrument, financial_instrument)
 GADGET_BOILER_PLATE_IMPL(Quote, quote)
+
+
+QString SymbolSearchResult::getTypeDisp() const {
+    std::ostringstream oss;
+    oss << type;
+    return QString::fromStdString(oss.str());
+}
+
 
 }  // close cartera namespace
 

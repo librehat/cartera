@@ -46,18 +46,21 @@ class SymbolSearchResult : public symbol_search_result {
     Q_GADGET
 
     Q_PROPERTY(int type READ getType)
+    Q_PROPERTY(QString typeDisp READ getTypeDisp)
     Q_PROPERTY(QString symbol READ getSymbol)
     Q_PROPERTY(int source READ getSource)
     Q_PROPERTY(QString exchangeCode READ getExchangeCode)
     Q_PROPERTY(QString name READ getName)
-    
+
     GADGET_BOILER_PLATE_DECL(SymbolSearchResult, symbol_search_result)
-    
+
     ENUM_CLASS_PROP_IMPL(getType, type)
     STL_STRING_PROP_IMPL(getSymbol, symbol)
     ENUM_CLASS_PROP_IMPL(getSource, source)
     STL_STRING_PROP_IMPL(getExchangeCode, exchange_code)
     STL_STRING_PROP_IMPL(getName, name)
+
+    QString getTypeDisp() const;
 };
 
 class FinancialInstrument : public financial_instrument {

@@ -31,14 +31,20 @@ Backend::Backend(QJSEngine* engine, QObject* parent)
     , m_jsEngine(engine)
 {}
 
-void Backend::searchSymbols(const QString& keyword, const QJSValue& callback) const
+void Backend::searchSymbols(const QString& keyword, const QJSValue& callback, const QJSValue& errorCb) const
 {
     using ResultType = QVector<SymbolSearchResult>;
 
     auto* watcher = new QFutureWatcher<ResultType>(this->parent());
-    connect(watcher, &QFutureWatcher<ResultType>::finished, [this, watcher, callback]() {
-        QJSValue cb(callback);
-        cb.call(QJSValueList{ m_jsEngine->toScriptValue(watcher->result()) });
+    connect(watcher, &QFutureWatcher<ResultType>::finished, [this, watcher, callback, errorCb]() {
+        try {
+            QJSValue cb(callback);
+            cb.call(QJSValueList{ m_jsEngine->toScriptValue(watcher->result()) });
+        }
+        catch (const std::exception& e) {
+            QJSValue eCb(errorCb);
+            eCb.call(QJSValueList{ m_jsEngine->toScriptValue(QString(e.what())) });
+        }
         watcher->deleteLater();
         });
     watcher->setFuture(
@@ -54,12 +60,18 @@ void Backend::searchSymbols(const QString& keyword, const QJSValue& callback) co
     );
 }
 
-void Backend::getQuote(const QString& symbol, int source, const QJSValue& callback) const
+void Backend::getQuote(const QString& symbol, int source, const QJSValue& callback, const QJSValue& errorCb) const
 {
     auto* watcher = new QFutureWatcher<Quote>(this->parent());
-    connect(watcher, &QFutureWatcher<Quote>::finished, [this, watcher, callback]() {
-        QJSValue cb(callback);
-        cb.call(QJSValueList{ m_jsEngine->toScriptValue(watcher->result()) });
+    connect(watcher, &QFutureWatcher<Quote>::finished, [this, watcher, callback, errorCb]() {
+        try {
+            QJSValue cb(callback);
+            cb.call(QJSValueList{ m_jsEngine->toScriptValue(watcher->result()) });
+        }
+        catch (const std::exception& e) {
+            QJSValue eCb(errorCb);
+            eCb.call(QJSValueList{ m_jsEngine->toScriptValue(QString(e.what())) });
+        }
         watcher->deleteLater();
         });
     watcher->setFuture(
