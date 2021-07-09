@@ -1,8 +1,8 @@
 project(cartera)
 
 cmake_minimum_required(VERSION 3.10)
-set(KF5_MIN_VERSION "5.76.0")
-set(QT_MIN_VERSION "5.12.0")
+set(KF5_MIN_VERSION "5.82.0")
+set(QT_MIN_VERSION "5.15.0")
 
 ################# set KDE specific information #################
 
