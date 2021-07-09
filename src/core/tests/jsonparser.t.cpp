@@ -110,6 +110,22 @@ BOOST_AUTO_TEST_CASE(parse_quote_ETH_USD)
     BOOST_CHECK_EQUAL(std::chrono::duration_cast<std::chrono::seconds>(result.updated_time.time_since_epoch()).count(), 1625680262);
 }
 
+BOOST_AUTO_TEST_CASE(parse_quotes)
+{
+    const std::string json_filepath{ "./fixture/yh_quotes.json" };
+    const auto result = yahoo_parser::parse_quotes(read_file(json_filepath));
+    
+    BOOST_REQUIRE_EQUAL(result.size(), 2);
+    BOOST_CHECK_EQUAL(result[0].symbol, "IBM");
+    BOOST_CHECK_CLOSE(result[0].current_price, 141.425, 1e-8);
+    BOOST_CHECK_CLOSE(result[0].volume, 262576, 1e-8);
+    BOOST_CHECK_CLOSE(result[0].day_high_price, 141.65, 1e-8);
+    BOOST_CHECK_CLOSE(result[0].day_low_price, 141.0406, 1e-8);
+    BOOST_CHECK_CLOSE(result[0].day_open_price, 137.78, 1e-8);
+    BOOST_CHECK_CLOSE(result[0].prev_day_close_price, 140.74, 1e-8);
+    BOOST_CHECK_EQUAL(result[1].symbol, "VOD.L");
+}
+
 BOOST_AUTO_TEST_CASE(parse_financial_instrument_ETHUSDT_Binance)
 {
     const std::string json_filepath{ "./fixture/ETHUSDT_exchangeInfo.json" };

@@ -24,6 +24,21 @@
 #include <QJSEngine>
 #include <QtDebug>
 
+#define CREATE_WATCHER(RTYPE, CALLBACK, ERROR_CALLBACK) \
+    auto* watcher = new QFutureWatcher< RTYPE >(this->parent()); \
+    connect(watcher, &QFutureWatcher< RTYPE >::finished, [this, watcher, CALLBACK, ERROR_CALLBACK]() { \
+        try { \
+            QJSValue cb( CALLBACK ); \
+            cb.call(QJSValueList{ m_jsEngine->toScriptValue(watcher->result()) }); \
+        } \
+        catch (const std::exception& e) { \
+            QJSValue eCb( ERROR_CALLBACK ); \
+            eCb.call(QJSValueList{ m_jsEngine->toScriptValue(QString(e.what())) }); \
+        } \
+        watcher->deleteLater(); \
+        });
+
+
 namespace cartera {
 
 Backend::Backend(QJSEngine* engine, QObject* parent)
@@ -35,23 +50,13 @@ void Backend::searchSymbols(const QString& keyword, const QJSValue& callback, co
 {
     using ResultType = QVector<SymbolSearchResult>;
 
-    auto* watcher = new QFutureWatcher<ResultType>(this->parent());
-    connect(watcher, &QFutureWatcher<ResultType>::finished, [this, watcher, callback, errorCb]() {
-        try {
-            QJSValue cb(callback);
-            cb.call(QJSValueList{ m_jsEngine->toScriptValue(watcher->result()) });
-        }
-        catch (const std::exception& e) {
-            QJSValue eCb(errorCb);
-            eCb.call(QJSValueList{ m_jsEngine->toScriptValue(QString(e.what())) });
-        }
-        watcher->deleteLater();
-        });
+    CREATE_WATCHER(ResultType, callback, errorCb)
     watcher->setFuture(
         // capture by value, the lifespan of &keyword is shorter than the lambda
         QtConcurrent::run([keyword, this]() -> ResultType {
             auto res = m_feedApi.search_symbols(keyword.toStdString());
             ResultType out;
+            out.reserve(res.size());
             for (auto&& item : res) {
                 out.push_back(std::move(item));
             }
@@ -62,18 +67,7 @@ void Backend::searchSymbols(const QString& keyword, const QJSValue& callback, co
 
 void Backend::getQuote(const QString& symbol, int source, const QJSValue& callback, const QJSValue& errorCb) const
 {
-    auto* watcher = new QFutureWatcher<Quote>(this->parent());
-    connect(watcher, &QFutureWatcher<Quote>::finished, [this, watcher, callback, errorCb]() {
-        try {
-            QJSValue cb(callback);
-            cb.call(QJSValueList{ m_jsEngine->toScriptValue(watcher->result()) });
-        }
-        catch (const std::exception& e) {
-            QJSValue eCb(errorCb);
-            eCb.call(QJSValueList{ m_jsEngine->toScriptValue(QString(e.what())) });
-        }
-        watcher->deleteLater();
-        });
+    CREATE_WATCHER(Quote, callback, errorCb)
     watcher->setFuture(
         QtConcurrent::run([symbol, source, this]() -> Quote {
             return m_feedApi.get_quote(symbol.toStdString(), static_cast<feed_source>(source));
@@ -81,4 +75,37 @@ void Backend::getQuote(const QString& symbol, int source, const QJSValue& callba
     );
 }
 
+void Backend::getQuotes(const QStringList& symbols, const QList<int>& sources, const QJSValue& callback, const QJSValue& errorCb) const
+{
+    if (sources.length() != symbols.length()) {
+        QJSValue eCb(errorCb);
+        eCb.call(QJSValueList{ QString("The length of symbols mismatches the length of sources")});
+    }
+
+    using ResultType = QVector<Quote>;
+
+    CREATE_WATCHER(ResultType, callback, errorCb)
+    watcher->setFuture(
+        QtConcurrent::run([symbols, sources, this]() -> ResultType {
+            std::vector<std::string> symbols_strs;  // we need to keep the underlying string for string_view
+            std::vector<std::pair<std::string_view, feed_source>> inputs;
+            symbols_strs.reserve(symbols.length());
+            inputs.reserve(symbols.length());
+            for (int i = 0; i < symbols.length(); ++i) {
+                symbols_strs.push_back(symbols[i].toStdString());
+                inputs.emplace_back(symbols_strs[i], static_cast<feed_source>(sources[i]));
+            }
+            auto res = m_feedApi.get_quotes(inputs);
+            ResultType out;
+            out.reserve(res.size());
+            for (auto&& item : res) {
+                out.push_back(std::move(item));
+            }
+            return out;
+        })
+    );
+}
+
 }  // close cartera namespace
+
+#undef CREATE_WATCHER

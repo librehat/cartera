@@ -27,3 +27,12 @@ function searchSymbols(keyword) {
         });
     });
 }
+
+
+function getQuotes(symbols, sources) {
+    return new Promise((resolve, reject) => {
+        Cartera.Backend.getQuotes(symbols, sources, resolve, (errorMsg) => {
+            reject(new Error(errorMsg));
+        });
+    });
+}

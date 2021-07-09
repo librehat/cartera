@@ -33,6 +33,7 @@ template<>
 struct json_parser<feed_source::YahooFinance> {
     static financial_instrument parse_financial_instrument(const std::string& data);
     static quote parse_quote(const std::string& data);
+    static std::vector<quote> parse_quotes(const std::string& data);
     static std::vector<symbol_search_result> parse_search_quote(const std::string& data);
 };
 

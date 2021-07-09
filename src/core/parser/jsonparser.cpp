@@ -117,6 +117,7 @@ quote json_parser<feed_source::YahooFinance>::parse_quote(const std::string& dat
     return quote{
         datetime(std::chrono::seconds(epoch_s)),
         quote_result.at("symbol").as_string().data(),
+        feed_source::YahooFinance,
         json_value_as_double(quote_result.at("regularMarketDayLow").at("raw")),
         json_value_as_double(quote_result.at("regularMarketDayHigh").at("raw")),
         json_value_as_double(quote_result.at("regularMarketOpen").at("raw")),
@@ -128,12 +129,48 @@ quote json_parser<feed_source::YahooFinance>::parse_quote(const std::string& dat
     };
 }
 
+std::vector<quote> json_parser<feed_source::YahooFinance>::parse_quotes(const std::string& data)
+{
+    const json::value document = json::parse(data);
+    const json::object& quote_response = document.at("quoteResponse").as_object();
+    if (quote_response.contains("error") && !quote_response.at("error").is_null()) {
+        throw cartera_exception(quote_response.at("error").as_string().data());
+    }
+
+    const json::array& results = quote_response.at("result").as_array();
+    std::vector<quote> out;
+    out.reserve(results.size());
+    for (const auto& result : results) {
+        std::optional<double> market_cap_val;
+        if (result.as_object().contains("marketCap") && result.at("marketCap").is_number()) {
+            market_cap_val = json_value_as_double(result.at("marketCap"));
+        }
+        out.emplace_back(
+            quote{
+                datetime(std::chrono::seconds(result.at("regularMarketTime").as_int64())),
+                result.at("symbol").as_string().data(),
+                feed_source::YahooFinance,
+                json_value_as_double(result.at("regularMarketDayLow")),
+                json_value_as_double(result.at("regularMarketDayHigh")),
+                json_value_as_double(result.at("regularMarketOpen")),
+                json_value_as_double(result.at("regularMarketPreviousClose")),
+                json_value_as_double(result.at("regularMarketPrice")),
+                json_value_as_double(result.at("regularMarketVolume")),
+                true, // FIXME
+                market_cap_val,
+            }
+        );
+    }
+    return out;
+}
+
 std::vector<symbol_search_result> json_parser<feed_source::YahooFinance>::parse_search_quote(const std::string& data)
 {
     std::vector<symbol_search_result> results{};
     
     const json::value document = json::parse(data);
     const json::array& quotes = document.at("quotes").as_array();
+    results.reserve(quotes.size());
     for (const auto& quote : quotes) {
         const auto name =
             quote.as_object().contains("longname") ?
@@ -178,6 +215,7 @@ quote json_parser<feed_source::Binance>::parse_quote(const std::string& data)
     return quote{
         datetime::clock::now(),  // FIXME: is this even true? no delayed pricing?
         document.at("symbol").as_string().data(),
+        feed_source::Binance,
         json_value_as_double(document.at("lowPrice")),
         json_value_as_double(document.at("highPrice")),
         json_value_as_double(document.at("openPrice")),
@@ -195,6 +233,7 @@ std::vector<symbol_search_result> json_parser<feed_source::Binance>::parse_searc
     const json::array& symbols = document.at("symbols").as_array();
 
     std::vector<symbol_search_result> results{};
+    results.reserve(symbols.size());
     for (const auto& symbol : symbols) {
         std::ostringstream oss;
         oss << symbol.at("baseAsset").as_string().data() << "/" << symbol.at("quoteAsset").as_string().data();

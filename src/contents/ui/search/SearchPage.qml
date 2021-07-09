@@ -3,7 +3,7 @@ import QtQuick.Layouts 1.12
 import QtQml.Models 2.12
 import QtQuick.Controls 2.12 as Controls
 import org.kde.kirigami 2.10 as Kirigami
-import "/code/backend.js" as Backend
+import "qrc:/code/backend.js" as Backend
 
 Kirigami.ScrollablePage {
     id: root

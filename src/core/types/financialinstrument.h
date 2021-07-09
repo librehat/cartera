@@ -92,6 +92,7 @@ struct quote
 {
     datetime updated_time;
     std::string symbol;
+    feed_source source;
     double day_low_price;
     double day_high_price;
     double day_open_price;

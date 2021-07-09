@@ -49,12 +49,28 @@ struct basic_feed
     }
 
     template<feed_source SOURCE>
+    static std::vector<quote> resolve_quotes(const simple_http_client& client, const std::vector<std::string_view>& symbols)
+    {
+        // The default implementation simply calls 'resolve_quote' multiple times.
+        // Any feeds that have more optimised endpoints should implement it with template specialisation.
+        std::vector<quote> results;
+        results.reserve(symbols.size());
+        for (const auto& symbol : symbols) {
+            results.push_back(resolve_quote<SOURCE>(client, symbol));
+        }
+        return results;
+    }
+
+    template<feed_source SOURCE>
     static std::vector<symbol_search_result> search_symbols(const simple_http_client& client, const std::string_view& keyword)
     {
         const std::string resp = client.get(details::urls<SOURCE>::search(keyword));
         return json_parser<SOURCE>::parse_search_quote(resp);
     }
 };
+
+template<>
+std::vector<quote> basic_feed::resolve_quotes<feed_source::YahooFinance>(const simple_http_client& client, const std::vector<std::string_view>& symbols);
 
 template<>
 std::vector<symbol_search_result> basic_feed::search_symbols<feed_source::Binance>(const simple_http_client& client, const std::string_view& keyword);

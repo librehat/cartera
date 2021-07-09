@@ -19,12 +19,26 @@
 
 #include <algorithm>
 #include <mutex>
+#include <sstream>
 
 std::optional<std::vector<cartera::symbol_search_result>> g_binance_all_symbols;
 std::mutex g_binance_all_symbols_mutex;
 
 namespace cartera {
 namespace feed {
+
+template<>
+std::vector<quote> basic_feed::resolve_quotes<feed_source::YahooFinance>(
+    const simple_http_client& client, const std::vector<std::string_view>& symbols)
+{
+    std::ostringstream oss;
+    oss << "https://query2.finance.yahoo.com/v7/finance/quote?symbols=";
+    std::copy(symbols.begin(), symbols.end() - 1, std::ostream_iterator<std::string_view>(oss, ","));
+    oss << symbols.back()
+        << "&fields=symbol,regularMarketPrice,regularMarketTime,regularMarketVolume,regularMarketDayRange,regularMarketOpen,regularMarketPreviousClose,marketCap";
+    const std::string resp = client.get(oss.str());
+    return json_parser<feed_source::YahooFinance>::parse_quotes(resp);
+}
 
 template<>
 std::vector<symbol_search_result> basic_feed::search_symbols<feed_source::Binance>(

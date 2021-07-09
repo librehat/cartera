@@ -89,6 +89,7 @@ class Quote : public quote {
     
     Q_PROPERTY(QDateTime updatedTime READ getUpdatedTime)
     Q_PROPERTY(QString symbol READ getSymbol)
+    Q_PROPERTY(int source READ getSource)
     Q_PROPERTY(double dayLowPrice MEMBER day_low_price)
     Q_PROPERTY(double dayHighPrice MEMBER day_high_price)
     Q_PROPERTY(double dayOpenPrice MEMBER day_open_price)
@@ -101,6 +102,7 @@ class Quote : public quote {
     GADGET_BOILER_PLATE_DECL(Quote, quote)
 
     STL_STRING_PROP_IMPL(getSymbol, symbol)
+    ENUM_CLASS_PROP_IMPL(getSource, source)
 
     inline QDateTime getUpdatedTime() const {
         return QDateTime::fromMSecsSinceEpoch(

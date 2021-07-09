@@ -33,6 +33,8 @@ public:
 
     quote get_quote(const std::string_view& symbol, feed_source source) const;
 
+    std::vector<quote> get_quotes(const std::vector<std::pair<std::string_view, feed_source>>& symbols) const;
+
 private:
     simple_http_client m_http_client;
 };
