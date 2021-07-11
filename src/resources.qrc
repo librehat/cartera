@@ -1,10 +1,10 @@
 <RCC>
     <qresource prefix="/">
         <file alias="main.qml">contents/ui/main.qml</file>
-        <file alias="search/SearchPage.qml">contents/ui/search/SearchPage.qml</file>
         <file alias="search/SearchItemDelegate.qml">contents/ui/search/SearchItemDelegate.qml</file>
         <file alias="watch/WatchListItem.qml">contents/ui/watch/WatchListItem.qml</file>
         <file alias="watch/WatchListPage.qml">contents/ui/watch/WatchListPage.qml</file>
+        <file alias="search/SearchDialog.qml">contents/ui/search/SearchDialog.qml</file>
     </qresource>
     <qresource prefix="/code">
         <file alias="backend.js">contents/code/backend.js</file>

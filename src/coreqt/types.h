@@ -133,6 +133,7 @@ class SymbolQuote {
     Q_GADGET
 
     Q_PROPERTY(QString symbol MEMBER m_symbol)
+    Q_PROPERTY(int source MEMBER m_source)
     Q_PROPERTY(QString shortName MEMBER m_shortName)
     Q_PROPERTY(QString longName MEMBER m_longName)
     Q_PROPERTY(QString currentPriceDisp READ currentPriceDisp)
@@ -152,6 +153,7 @@ public:
     inline double priceChange() const { return m_currentPrice - m_prevDayClosePrice; }
 
 private:
+    int m_source;  // must be a valid feed_source enum value
     QString m_symbol;
     QString m_longName;
     QString m_shortName;

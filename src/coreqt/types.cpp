@@ -47,13 +47,15 @@ QString SymbolSearchResult::getTypeDisp() const
 }
 
 SymbolQuote::SymbolQuote()
-    : m_currentPrice(0)
+    : m_source(0)
+    , m_currentPrice(0)
     , m_prevDayClosePrice(0)
     , m_priceDecimalHint(2)
 {}
 
 SymbolQuote::SymbolQuote(quote&& quote, financial_instrument&& fi)
-    : m_symbol(QString::fromStdString(quote.symbol))
+    : m_source(static_cast<int>(quote.source))
+    , m_symbol(QString::fromStdString(quote.symbol))
     , m_longName(QString::fromStdString(fi.long_name))
     , m_shortName(QString::fromStdString(fi.short_name))
     , m_currency(QString::fromStdString(fi.currency))
