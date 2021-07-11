@@ -1,5 +1,5 @@
 import QtQuick.Controls 2.12 as Controls
-import org.kde.kirigami 2.15 as Kirigami
+import org.kde.kirigami 2.12 as Kirigami
 
 
 Kirigami.BasicListItem {
