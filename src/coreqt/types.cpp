@@ -39,10 +39,61 @@ GADGET_BOILER_PLATE_IMPL(FinancialInstrument, financial_instrument)
 GADGET_BOILER_PLATE_IMPL(Quote, quote)
 
 
-QString SymbolSearchResult::getTypeDisp() const {
+QString SymbolSearchResult::getTypeDisp() const
+{
     std::ostringstream oss;
     oss << type;
     return QString::fromStdString(oss.str());
+}
+
+SymbolQuote::SymbolQuote()
+    : m_currentPrice(0)
+    , m_prevDayClosePrice(0)
+    , m_priceDecimalHint(2)
+{}
+
+SymbolQuote::SymbolQuote(quote&& quote, financial_instrument&& fi)
+    : m_symbol(QString::fromStdString(quote.symbol))
+    , m_longName(QString::fromStdString(fi.long_name))
+    , m_shortName(QString::fromStdString(fi.short_name))
+    , m_currency(QString::fromStdString(fi.currency))
+    , m_currentPrice(quote.current_price)
+    , m_prevDayClosePrice(quote.prev_day_close_price)
+    , m_priceDecimalHint(2)  // FIXME
+{}
+
+SymbolQuote SymbolQuote::fromData(quote&& quote, financial_instrument&& fi)
+{
+    return SymbolQuote{ std::move(quote), std::move(fi) };
+}
+
+QString SymbolQuote::currentPriceDisp() const
+{
+    return QString("%1 %2").arg(
+        m_locale.toString(m_currentPrice, 'f', m_priceDecimalHint)
+    ).arg(m_currency);
+}
+
+QString SymbolQuote::priceChangeDisp() const
+{
+    return QString("%1%2")
+        .arg(
+            isPositivePriceChange() ? m_locale.positiveSign() : m_locale.negativeSign()
+        ).arg(
+            m_locale.toString(abs(priceChange()), 'f', m_priceDecimalHint)
+        );
+}
+
+QString SymbolQuote::priceChangePercentDisp() const
+{
+    return QString("%1%2%3")
+        .arg(
+            isPositivePriceChange() ? m_locale.positiveSign() : m_locale.negativeSign()
+        ).arg(
+            m_locale.toString(abs(priceChange() / m_prevDayClosePrice * 100), 'f', 2)
+        ).arg(
+            m_locale.percent()
+        );
 }
 
 

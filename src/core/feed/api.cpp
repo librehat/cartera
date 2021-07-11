@@ -49,6 +49,13 @@ struct feed_aggregator<feed_source::k_END> {
 
 template<feed_source S>
 struct feed_finder {
+    static financial_instrument get_financial_instrument(feed_source source, const simple_http_client& http_client, const std::string_view& symbol) {
+        if (S != source) {
+            return feed_finder<static_cast<feed_source>(static_cast<int>(S) + 1)>::get_financial_instrument(source, http_client, symbol);
+        }
+        return feed::basic_feed::resolve_symbol<S>(http_client, symbol);
+    }
+
     static quote get_quote(feed_source source, const simple_http_client& http_client, const std::string_view& symbol) {
         if (S != source) {
             return feed_finder<static_cast<feed_source>(static_cast<int>(S) + 1)>::get_quote(source, http_client, symbol);
@@ -66,6 +73,12 @@ struct feed_finder {
 
 template<>
 struct feed_finder<feed_source::k_END> {
+    static financial_instrument get_financial_instrument(feed_source source, const simple_http_client&, const std::string_view&) {
+        std::ostringstream oss;
+        oss << "Cannot find the feed source=" << source;
+        throw cartera_exception(oss.str());
+    }
+
     static quote get_quote(feed_source source, const simple_http_client&, const std::string_view&) {
         std::ostringstream oss;
         oss << "Cannot find the feed source=" << source;
@@ -90,6 +103,20 @@ std::vector<symbol_search_result> api::search_symbols(const std::string_view& ke
     std::vector<symbol_search_result> out;
     feed_aggregator<feed_source::YahooFinance>::search_symbols(out, m_http_client, keyword);
     return out;
+}
+
+financial_instrument api::get_financial_instrument(const std::string_view& symbol, feed_source source)
+{
+    std::lock_guard<std::mutex> mutex_guard(m_fi_cache_mutex);
+    auto& cache = m_financial_instruments_cache[static_cast<int>(source)];
+    const std::string key{ symbol };
+    auto it = cache.find(key);
+    if (it == cache.end()) {
+        auto res = feed_finder<feed_source::YahooFinance>::get_financial_instrument(source, m_http_client, symbol);
+        cache.insert(it, { key, res });
+        return res;
+    }
+    return it->second;
 }
 
 quote api::get_quote(const std::string_view& symbol, feed_source source) const

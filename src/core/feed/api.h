@@ -21,6 +21,10 @@
 #include "basicfeed.h"
 #include "http/client.h"
 
+#include <array>
+#include <unordered_map>
+#include <mutex>
+
 namespace cartera {
 namespace feed {
 
@@ -31,12 +35,19 @@ public:
     // Search symbols across all available feed sources and aggregate the results
     std::vector<symbol_search_result> search_symbols(const std::string_view& keyword) const;
 
+    // Get the basic information about a symbol from the specified feed source
+    // This function is cached and future calls with the same parameters will return cached results
+    financial_instrument get_financial_instrument(const std::string_view& symbol, feed_source source);
+
     quote get_quote(const std::string_view& symbol, feed_source source) const;
 
     std::vector<quote> get_quotes(const std::vector<std::pair<std::string_view, feed_source>>& symbols) const;
 
 private:
     simple_http_client m_http_client;
+
+    std::array<std::unordered_map<std::string, financial_instrument>, static_cast<int>(feed_source::k_END)> m_financial_instruments_cache;
+    std::mutex m_fi_cache_mutex;
 };
 
 }  // close feed namespace

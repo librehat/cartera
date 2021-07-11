@@ -1,5 +1,6 @@
 import QtQuick 2.15
 import QtQml.Models 2.15
+import Qt.labs.qmlmodels 1.0
 import QtQuick.Controls 2.15 as Controls
 import org.kde.kirigami 2.15 as Kirigami
 import "qrc:/code/backend.js" as Backend
@@ -13,6 +14,12 @@ Kirigami.ScrollablePage {
 
     contextualActions: [
         Kirigami.Action {
+            text: "Add"
+            onTriggered: {
+                // TODO: show search to add symbols
+            }
+        },
+        Kirigami.Action {
             text: "Refresh"
             enabled: !root.refreshing
             onTriggered: {
@@ -20,11 +27,17 @@ Kirigami.ScrollablePage {
             }
         }
     ]
+    
+    ListModel {
+        id: watchListModel
+    }
 
     ListView {
         spacing: Kirigami.Units.smallSpacing
-        model: ListModel { id: watchListModel }
-        delegate: WatchListItem { }
+
+        model: watchListModel
+
+        delegate: WatchListItem {}
     }
 
     Connections {
@@ -37,12 +50,14 @@ Kirigami.ScrollablePage {
     }
 
     function refreshData() {
-        // TODO
         let symbols = ["IBM", "VOD.L", "MA", "BTCUSDT"];
         let sources = [0, 0, 0, 1];
-        Backend.getQuotes(symbols, sources)
+        Backend.getSymbolQuotes(symbols, sources)
         .then((results) => {
-            console.log(results);
+            watchListModel.clear();
+            results.forEach((item) => {
+                watchListModel.append(item);
+            });
         }).catch((error) => {
             root.errored(error);
         }).then(() => {

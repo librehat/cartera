@@ -43,9 +43,9 @@ public:
     // The 'errorCb' must take a single parameter of QString that is the error message
     Q_INVOKABLE void getQuote(const QString& symbol, int source, const QJSValue& callback, const QJSValue& errorCb) const;
 
-    // Get multiples quotes. Similar to 'getQuote' but works in bulk
+    // A convenient API for the UI to retrieve necessary data to display in bulk
     // This allows the usage of more efficient APIs to get the quotes for multiple symbols
-    Q_INVOKABLE void getQuotes(const QStringList& symbols, const QList<int>& sources, const QJSValue& callback, const QJSValue& errorCb) const;
+    Q_INVOKABLE void getSymbolQuotes(const QStringList& symbols, const QList<int>& sources, const QJSValue& callback, const QJSValue& errorCb);
 
 private:
     feed::api m_feedApi;

@@ -1,5 +1,5 @@
 /*
- * The core types are extended here so they can be used by QMetaObject
+ * Types that can be passed from C++ to the QML side
  * Copyright (C) 2021  Simeon Huang <symeon@librehat.com>
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -18,9 +18,10 @@
 #ifndef CARTERA_COREQT_TYPES_H
 #define CARTERA_COREQT_TYPES_H
 
+#include <QDateTime>
+#include <QLocale>
 #include <QObject>
-#include <qdatetime.h>
-#include <qvariant.h>
+#include <QVariant>
 
 #include "types/financialinstrument.h"
 
@@ -42,6 +43,9 @@ public: \
 
 namespace cartera {
  
+//----------------------------------------------------------------------------
+// Classes below are simply extended from the core library
+//----------------------------------------------------------------------------
 class SymbolSearchResult : public symbol_search_result {
     Q_GADGET
 
@@ -83,7 +87,6 @@ class FinancialInstrument : public financial_instrument {
     STL_STRING_PROP_IMPL(getLongName, long_name)
 };
 
-
 class Quote : public quote {
     Q_GADGET
     
@@ -121,11 +124,50 @@ class Quote : public quote {
     }
 };
 
+//----------------------------------------------------------------------------
+// Classes below are created specifically for easy UI building
+//----------------------------------------------------------------------------
+
+// This class contains all necessary data fields to be displayed for a symbol
+class SymbolQuote {
+    Q_GADGET
+
+    Q_PROPERTY(QString symbol MEMBER m_symbol)
+    Q_PROPERTY(QString shortName MEMBER m_shortName)
+    Q_PROPERTY(QString longName MEMBER m_longName)
+    Q_PROPERTY(QString currentPriceDisp READ currentPriceDisp)
+    Q_PROPERTY(QString priceChangeDisp READ priceChangeDisp)
+    Q_PROPERTY(QString priceChangePercentDisp READ priceChangePercentDisp)
+    Q_PROPERTY(bool isPositivePriceChange READ isPositivePriceChange)
+
+public:
+    explicit SymbolQuote();
+    explicit SymbolQuote(quote&& quote, financial_instrument&& fi);
+    static SymbolQuote fromData(quote&& quote, financial_instrument&& fi);
+
+    QString currentPriceDisp() const;
+    QString priceChangeDisp() const;
+    QString priceChangePercentDisp() const;
+    inline bool isPositivePriceChange() const { return priceChange() > 0; }
+    inline double priceChange() const { return m_currentPrice - m_prevDayClosePrice; }
+
+private:
+    QString m_symbol;
+    QString m_longName;
+    QString m_shortName;
+    QString m_currency;
+    double m_currentPrice;
+    double m_prevDayClosePrice;  // old price
+    int m_priceDecimalHint;  // how many decimal places
+
+    QLocale m_locale;  // current system locale
+};
 
 }  // close cartera namespace
 
 Q_DECLARE_METATYPE(cartera::FinancialInstrument)
 Q_DECLARE_METATYPE(cartera::Quote)
+Q_DECLARE_METATYPE(cartera::SymbolQuote)
 
 #undef STL_STRING_PROP_IMPL
 #undef ENUM_CLASS_PROP_IMPL
