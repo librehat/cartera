@@ -48,12 +48,24 @@ json_configurator::json_configurator(const std::string& config_path)
     : m_config_path(config_path)
     , m_watch_list_config_file_path(config_path + "/watchlists.json")
 {
+    initialise();
+}
+
+json_configurator::json_configurator(std::string&& config_path)
+    : m_config_path(std::move(config_path))
+    , m_watch_list_config_file_path(m_config_path + "/watchlists.json")
+{
+    initialise();
+}
+
+void json_configurator::initialise()
+{
     const fs::path config_dir(m_config_path);
     if (!fs::exists(config_dir)) {
         fs::create_directory(config_dir);
     }
     else if (!fs::is_directory(config_dir)) {
-        throw std::runtime_error(std::string{ config_path } + " exists but is not a directory");
+        throw std::runtime_error(m_config_path + " exists but is not a directory");
     }
 
     // create empty valid configuration files if they don't exist

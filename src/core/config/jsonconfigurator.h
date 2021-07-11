@@ -34,6 +34,7 @@ class json_configurator {
 public:
     // the current user must have read and write permission in 'config_path'
     explicit json_configurator(const std::string& config_path);
+    explicit json_configurator(std::string&& config_path);
 
     // get all watch lists' names in the configured order
     std::vector<std::string> list_watch_lists();
@@ -49,6 +50,8 @@ public:
 private:
     const std::string m_config_path;
     const std::string m_watch_list_config_file_path;
+
+    void initialise();
 };
 
 }
