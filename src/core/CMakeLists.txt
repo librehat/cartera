@@ -6,10 +6,11 @@ set(libcarteracore_SRCS
     "feed/jsonparser.cpp"
     "types/feedsource.cpp"
     "types/financialinstrument.cpp"
+    "types/positionidentifier.cpp"
 )
 
 find_package(OpenSSL REQUIRED)
-find_package(Boost 1.75 COMPONENTS json system REQUIRED)
+find_package(Boost 1.75 COMPONENTS filesystem json system REQUIRED)
 find_package(Threads)
 
 add_library(carteracore STATIC ${libcarteracore_SRCS})

@@ -14,27 +14,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef CARTERA_TYPES_POSITIONIDENTIFIER_H
-#define CARTERA_TYPES_POSITIONIDENTIFIER_H
 
-#include "feedsource.h"
-
-#include <ostream>
-#include <string>
+#include "positionidentifier.h"
 
 namespace cartera {
 
-// Uniquely identifies a position (not necessarily a unique security)
-struct position_identifier {
-    feed_source source;
-    std::string symbol;
-};
-
-bool operator==(const position_identifier& lhs, const position_identifier& rhs);
-bool operator!=(const position_identifier& lhs, const position_identifier& rhs);
-
-std::ostream& operator<<(std::ostream& os, const position_identifier& pi);
-
+bool operator==(const position_identifier& lhs, const position_identifier& rhs)
+{
+    return lhs.source == rhs.source && lhs.symbol == rhs.symbol;
 }
 
-#endif
+bool operator!=(const position_identifier& lhs, const position_identifier& rhs)
+{
+    return !(lhs == rhs);
+}
+
+std::ostream& operator<<(std::ostream& os, const position_identifier& pi)
+{
+    os << "{ source=" << pi.source << ", symbol=" << pi.symbol << " }";
+    return os;
+}
+
+}

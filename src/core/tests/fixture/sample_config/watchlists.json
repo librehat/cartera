@@ -1,0 +1,28 @@
+[
+  {
+    "name": "List 1",
+    "members": [
+      {
+        "symbol": "IBM",
+        "source": 0
+      },
+      {
+        "symbol": "VOD.L",
+        "source": 0
+      }
+    ]
+  },
+  {
+    "name": "List 2",
+    "members": [
+      {
+        "symbol": "ETHBTC",
+        "source": 1
+      }
+    ]
+  },
+  {
+    "name": "Empty List",
+    "members": []
+  }
+]

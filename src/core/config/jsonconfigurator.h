@@ -22,16 +22,33 @@
 #include "types/positionidentifier.h"
 
 #include <string>
+#include <vector>
 
 namespace cartera {
 namespace config {
 
+using watch_list_item = position_identifier;
+
+// JSON files backed configurations manager
 class json_configurator {
 public:
+    // the current user must have read and write permission in 'config_path'
     explicit json_configurator(const std::string& config_path);
+
+    // get all watch lists' names in the configured order
+    std::vector<std::string> list_watch_lists();
+
+    // read data of a given watch list
+    // e.g. a valid JSON structure:
+    // { "name": "My Watch List", "members": [ { "symbol": "IBM", "source": 0 }, ...] }
+    std::vector<watch_list_item> read_watch_list_symbols(const std::string_view& list_name);
+
+    // save a watch list. if the list doesn't exist, a new one will be created and inserted to the end
+    void save_watch_list_symbols(const std::string_view& list_name, const std::vector<watch_list_item>& items);
 
 private:
     const std::string m_config_path;
+    const std::string m_watch_list_config_file_path;
 };
 
 }

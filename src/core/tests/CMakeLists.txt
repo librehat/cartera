@@ -2,7 +2,7 @@ find_package(Boost COMPONENTS filesystem REQUIRED)
 
 enable_testing()
 
-list(APPEND CARTERACORE_UNIT_TESTS jsonparser.t httpclient.t basicfeed.t feedapi.t)
+list(APPEND CARTERACORE_UNIT_TESTS jsonconfigurator.t jsonparser.t httpclient.t basicfeed.t feedapi.t)
 
 
 foreach(UNIT_TEST IN LISTS CARTERACORE_UNIT_TESTS)
