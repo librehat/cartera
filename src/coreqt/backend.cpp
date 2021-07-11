@@ -110,7 +110,16 @@ void Backend::getSymbolQuotes(const QStringList& symbols, const QList<int>& sour
             return out;
         })
     );
+}
 
+void Backend::getSymbolQuotesForWatchList(const QString& listName, const QJSValue& callback, const QJSValue& errorCb)
+{
+    // TODO
+}
+
+void Backend::saveWatchList(const QString& listName, const QStringList& symbols, const QList<int>& sources, const QJSValue& errorCb)
+{
+    // TODO
 }
 
 }  // close cartera namespace

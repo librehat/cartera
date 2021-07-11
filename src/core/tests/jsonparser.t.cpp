@@ -23,12 +23,12 @@
 
 #include <string>
 
-#include "parser/jsonparser.h"
+#include "feed/jsonparser.h"
 #include "types/financialinstrument.h"
 
 namespace fs = boost::filesystem;
-using yahoo_parser = cartera::json_parser<cartera::feed_source::YahooFinance>;
-using binance_parser = cartera::json_parser<cartera::feed_source::Binance>;
+using yahoo_parser = cartera::feed::json_parser<cartera::feed_source::YahooFinance>;
+using binance_parser = cartera::feed::json_parser<cartera::feed_source::Binance>;
 
 static std::string read_file(fs::path path)
 {

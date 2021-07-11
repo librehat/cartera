@@ -24,6 +24,7 @@
 namespace json = boost::json;
 
 namespace cartera {
+namespace feed {
 
 namespace {
 template <class STRING>
@@ -102,8 +103,8 @@ quote json_parser<feed_source::YahooFinance>::parse_quote(const std::string& dat
     }
     const json::array& result = quote_summary.at("result").as_array();
     const json::object& quote_result = result.at(0).at("price").as_object();
-    
-    const json::value *market_cap = quote_result.if_contains("marketCap");
+
+    const json::value* market_cap = quote_result.if_contains("marketCap");
     std::optional<double> market_cap_val;
     if (market_cap) {
         market_cap = market_cap->if_object() ? market_cap->as_object().if_contains("raw") : nullptr;
@@ -167,7 +168,7 @@ std::vector<quote> json_parser<feed_source::YahooFinance>::parse_quotes(const st
 std::vector<symbol_search_result> json_parser<feed_source::YahooFinance>::parse_search_quote(const std::string& data)
 {
     std::vector<symbol_search_result> results{};
-    
+
     const json::value document = json::parse(data);
     const json::array& quotes = document.at("quotes").as_array();
     results.reserve(quotes.size());
@@ -175,7 +176,7 @@ std::vector<symbol_search_result> json_parser<feed_source::YahooFinance>::parse_
         const auto name =
             quote.as_object().contains("longname") ?
             quote.at("longname").as_string() :
-            (quote.as_object().contains("shortname") ? quote.at("shortname").as_string() : json::string{""});
+            (quote.as_object().contains("shortname") ? quote.at("shortname").as_string() : json::string{ "" });
         results.emplace_back(
             symbol_search_result{
                 asset_class_from_quote_type(quote.at("quoteType").as_string()),
@@ -186,7 +187,7 @@ std::vector<symbol_search_result> json_parser<feed_source::YahooFinance>::parse_
             }
         );
     }
-    
+
     return results;
 }
 
@@ -250,4 +251,5 @@ std::vector<symbol_search_result> json_parser<feed_source::Binance>::parse_searc
     return results;
 }
 
+}  // close feed namespace
 }  // close cartera namespace

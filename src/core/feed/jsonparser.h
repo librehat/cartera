@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CARTERA_JSONPARSER_H
-#define CARTERA_JSONPARSER_H
+#ifndef CARTERA_FEED_JSONPARSER_H
+#define CARTERA_FEED_JSONPARSER_H
 
 #include "types/financialinstrument.h"
 #include "types/feedsource.h"
@@ -24,6 +24,7 @@
 #include <vector>
 
 namespace cartera {
+namespace feed {
 
 template<feed_source SOURCE>
 struct json_parser {
@@ -41,11 +42,12 @@ template<>
 struct json_parser<feed_source::Binance> {
     static financial_instrument parse_financial_instrument(const std::string& data);
     static quote parse_quote(const std::string& data);
-    
+
     // Binance doesn't have search endpoint, this function parses the full exchangeInfo response
     static std::vector<symbol_search_result> parse_search_quote(const std::string& data);
 };
 
-}
+}  // close feed namespace
+}  // close cartera namespace
 
-#endif // CARTERA_JSONPARSER_H
+#endif // CARTERA_FEED_JSONPARSER_H

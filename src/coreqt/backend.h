@@ -47,6 +47,11 @@ public:
     // This allows the usage of more efficient APIs to get the quotes for multiple symbols
     Q_INVOKABLE void getSymbolQuotes(const QStringList& symbols, const QList<int>& sources, const QJSValue& callback, const QJSValue& errorCb);
 
+    // A convenient API for the UI to retrieve necessary data for a watch list to display
+    Q_INVOKABLE void getSymbolQuotesForWatchList(const QString& listName, const QJSValue& callback, const QJSValue& errorCb);
+
+    Q_INVOKABLE void saveWatchList(const QString& listName, const QStringList& symbols, const QList<int>& sources, const QJSValue& errorCb);
+
 private:
     feed::api m_feedApi;
     QJSEngine* m_jsEngine;

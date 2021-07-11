@@ -22,7 +22,7 @@
 #include "types/financialinstrument.h"
 
 #include "http/client.h"
-#include "parser/jsonparser.h"
+#include "jsonparser.h"
 
 namespace cartera {
 namespace feed {
