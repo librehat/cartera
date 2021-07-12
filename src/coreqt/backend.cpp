@@ -25,6 +25,7 @@
 #include <QFutureWatcher>
 #include <QJSEngine>
 #include <QStandardPaths>
+#include <QUrl>
 #include <QtDebug>
 
 #define CREATE_WATCHER(RTYPE, CALLBACK, ERROR_CALLBACK) \
@@ -77,7 +78,8 @@ void Backend::searchSymbols(const QString& keyword, const QJSValue& callback, co
     watcher->setFuture(
         // capture by value, the lifespan of &keyword is shorter than the lambda
         QtConcurrent::run([keyword, this]() -> ResultType {
-            auto res = m_feedApi.search_symbols(keyword.toStdString());
+            // TODO: move the encoding bits into `core::http`
+            auto res = m_feedApi.search_symbols(QUrl::toPercentEncoding(keyword, QByteArray(), " ").toStdString());
             ResultType out;
             out.reserve(res.size());
             for (auto&& item : res) {

@@ -44,6 +44,8 @@ public:
 
     virtual ~simple_http_client();
 
+    // FIXME
+    // TODO: `url` should be encoded here instead of relying on the caller 
     std::string get(const std::string& url) const;
 
 protected:
