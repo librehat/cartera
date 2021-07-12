@@ -124,15 +124,15 @@ quote api::get_quote(const std::string_view& symbol, feed_source source) const
     return feed_finder<feed_source::YahooFinance>::get_quote(source, m_http_client, symbol);
 }
 
-std::vector<quote> api::get_quotes(const std::vector<std::pair<std::string_view, feed_source>>& symbols) const
+std::vector<quote> api::get_quotes(const std::vector<position_identifier>& pis) const
 {
     std::vector<quote> out;
-    out.resize(symbols.size());
+    out.resize(pis.size());
 
     std::array<std::pair<std::vector<std::string_view>, std::vector<int>>, static_cast<int>(feed_source::k_END)> inputs_array;
-    for (int i = 0; i < symbols.size(); ++i) {
-        inputs_array[static_cast<int>(symbols[i].second)].first.push_back(symbols[i].first);
-        inputs_array[static_cast<int>(symbols[i].second)].second.push_back(i);
+    for (int i = 0; i < pis.size(); ++i) {
+        inputs_array[static_cast<int>(pis[i].source)].first.push_back(pis[i].symbol);
+        inputs_array[static_cast<int>(pis[i].source)].second.push_back(i);
     }
 
     for (int i = 0; i < static_cast<int>(feed_source::k_END); ++i) {

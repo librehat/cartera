@@ -24,6 +24,7 @@
 #include <QVariant>
 
 #include "types/financialinstrument.h"
+#include "types/positionidentifier.h"
 
 #define STL_STRING_PROP_IMPL(READ_FUNC, MEM_NAME) \
     inline QString READ_FUNC() const { return QString::fromStdString( MEM_NAME ); }
@@ -124,6 +125,18 @@ class Quote : public quote {
     }
 };
 
+class PositionIdentifier : public position_identifier {
+    Q_GADGET
+
+    Q_PROPERTY(QString symbol READ getSymbol)
+    Q_PROPERTY(int source READ getSource)
+
+    GADGET_BOILER_PLATE_DECL(PositionIdentifier, position_identifier)
+
+    STL_STRING_PROP_IMPL(getSymbol, symbol)
+    ENUM_CLASS_PROP_IMPL(getSource, source)
+};
+
 //----------------------------------------------------------------------------
 // Classes below are created specifically for easy UI building
 //----------------------------------------------------------------------------
@@ -169,6 +182,7 @@ private:
 
 Q_DECLARE_METATYPE(cartera::FinancialInstrument)
 Q_DECLARE_METATYPE(cartera::Quote)
+Q_DECLARE_METATYPE(cartera::PositionIdentifier)
 Q_DECLARE_METATYPE(cartera::SymbolQuote)
 
 #undef STL_STRING_PROP_IMPL

@@ -37,6 +37,7 @@ namespace cartera {
 GADGET_BOILER_PLATE_IMPL(SymbolSearchResult, symbol_search_result)
 GADGET_BOILER_PLATE_IMPL(FinancialInstrument, financial_instrument)
 GADGET_BOILER_PLATE_IMPL(Quote, quote)
+GADGET_BOILER_PLATE_IMPL(PositionIdentifier, position_identifier)
 
 
 QString SymbolSearchResult::getTypeDisp() const

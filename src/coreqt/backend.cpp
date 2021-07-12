@@ -44,6 +44,25 @@
 
 namespace cartera {
 
+namespace {
+QVector<SymbolQuote> doFetchSymbolQuotes(const std::vector<position_identifier>& pis, feed::api& api) {
+    std::vector<financial_instrument> instruments_data;
+    instruments_data.reserve(pis.size());
+    for (const auto& pi : pis) {
+        instruments_data.push_back(api.get_financial_instrument(pi.symbol, pi.source));
+    }
+    auto quotes = api.get_quotes(pis);
+
+    QVector<SymbolQuote> out;
+    out.reserve(quotes.size());
+    for (auto&& [quote, fi] : boost::combine(quotes, instruments_data)) {
+        out.push_back(SymbolQuote::fromData(std::move(quote), std::move(fi)));
+    }
+    return out;
+}
+
+}  // close unnamed namespace
+
 Backend::Backend(QJSEngine* engine, QObject* parent)
     : QObject(parent)
     , m_config(QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation).toStdString())
@@ -91,25 +110,14 @@ void Backend::getSymbolQuotes(const QStringList& symbols, const QList<int>& sour
     CREATE_WATCHER(ResultType, callback, errorCb)
     watcher->setFuture(
         QtConcurrent::run([symbols, sources, this]() -> ResultType {
-            std::vector<std::string> symbols_strs;  // we need to keep the underlying string for string_view
-            std::vector<std::pair<std::string_view, feed_source>> inputs;
-            std::vector<financial_instrument> instruments_data;
-            symbols_strs.reserve(symbols.length());
+            std::vector<position_identifier> inputs;
             inputs.reserve(symbols.length());
-            instruments_data.reserve(symbols.length());
             for (int i = 0; i < symbols.length(); ++i) {
-                symbols_strs.push_back(symbols[i].toStdString());
-                inputs.emplace_back(symbols_strs[i], static_cast<feed_source>(sources[i]));
-                instruments_data.push_back(m_feedApi.get_financial_instrument(symbols_strs[i], static_cast<feed_source>(sources[i])));
+                inputs.emplace_back(
+                    position_identifier{ static_cast<feed_source>(sources[i]), symbols[i].toStdString() }
+                );
             }
-            auto quotes = m_feedApi.get_quotes(inputs);
-
-            ResultType out;
-            out.reserve(quotes.size());
-            for (auto&& [quote, fi] : boost::combine(quotes, instruments_data)) {
-                out.push_back(SymbolQuote::fromData(std::move(quote), std::move(fi)));
-            }
-            return out;
+            return doFetchSymbolQuotes(inputs, m_feedApi);
         })
     );
 }
@@ -132,11 +140,23 @@ void Backend::getAllWatchListNames(const QJSValue& callback, const QJSValue& err
 
 void Backend::getSymbolQuotesForWatchList(const QString& listName, const QJSValue& callback, const QJSValue& errorCb)
 {
-    // TODO
+    using ResultType = QVector<SymbolQuote>;
+    CREATE_WATCHER(ResultType, callback, errorCb)
+    watcher->setFuture(
+        QtConcurrent::run([listName, this]() -> ResultType {
+            const auto listItems = m_config.read_watch_list_symbols(listName.toStdString());
+            return doFetchSymbolQuotes(listItems, m_feedApi);
+        })
+    );
 }
 
 void Backend::saveWatchList(const QString& listName, const QStringList& symbols, const QList<int>& sources, const QJSValue& errorCb)
 {
+    if (sources.length() != symbols.length()) {
+        QJSValue eCb(errorCb);
+        eCb.call(QJSValueList{ QString("The length of symbols mismatches the length of sources")});
+    }
+
     std::vector<config::watch_list_item> listItems;
     listItems.reserve(symbols.size());
     for (const auto& [symbol, source] : boost::combine(symbols, sources)) {

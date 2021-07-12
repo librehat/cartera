@@ -46,11 +46,14 @@ public:
 
     // A convenient API for the UI to retrieve necessary data to display in bulk
     // This allows the usage of more efficient APIs to get the quotes for multiple symbols
+    // The 'callback' must take a single parameter of type QVector<SymbolQuote>
     Q_INVOKABLE void getSymbolQuotes(const QStringList& symbols, const QList<int>& sources, const QJSValue& callback, const QJSValue& errorCb);
 
     // A convenient API for the UI to retrieve necessary data for a watch list to display
+    // The 'callback' must take a single parameter of type QVector<SymbolQuote>
     Q_INVOKABLE void getSymbolQuotesForWatchList(const QString& listName, const QJSValue& callback, const QJSValue& errorCb);
 
+    // The 'callback' must take a single parameter of type QStringList
     Q_INVOKABLE void getAllWatchListNames(const QJSValue& callback, const QJSValue& errorCb);
 
     Q_INVOKABLE void saveWatchList(const QString& listName, const QStringList& symbols, const QList<int>& sources, const QJSValue& errorCb);

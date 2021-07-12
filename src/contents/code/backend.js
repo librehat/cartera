@@ -36,6 +36,14 @@ function getSymbolQuotes(symbols, sources) {
     });
 }
 
+function getSymbolQuotesForList(listName) {
+    return new Promise((resolve, reject) => {
+        Cartera.Backend.getSymbolQuotesForWatchList(listName, resolve, (errorMsg) => {
+            reject(new Error(errorMsg));
+        });
+    });
+}
+
 function getAllWatchListNames() {
     return new Promise((resolve, reject) => {
         Cartera.Backend.getAllWatchListNames(resolve, (errorMsg) => {

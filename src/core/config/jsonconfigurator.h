@@ -23,6 +23,7 @@
 
 #include <string>
 #include <vector>
+#include <mutex>
 
 namespace cartera {
 namespace config {
@@ -30,7 +31,6 @@ namespace config {
 using watch_list_item = position_identifier;
 
 // JSON files backed configurations manager
-// Methods of this class are not thread-safe
 class json_configurator {
 public:
     // the current user must have read and write permission in 'config_path'
@@ -51,8 +51,12 @@ public:
 private:
     const std::string m_config_path;
     const std::string m_watch_list_config_file_path;
+    std::mutex m_mutex;
 
+    
     void initialise();
+    std::string read_file(const std::string& path);
+    void write_file(const std::string& path, const std::string& content);
 };
 
 }

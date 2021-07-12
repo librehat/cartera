@@ -1,6 +1,6 @@
 import QtQuick 2.15
 import QtQml.Models 2.15
-import QtQuick.Controls 2.15 as Controls
+import QtQuick.Controls 2.15
 import org.kde.kirigami 2.15 as Kirigami
 import "qrc:/code/backend.js" as Backend
 import "qrc:/search" as Search
@@ -10,7 +10,7 @@ Kirigami.ScrollablePage {
 
     property string listName: ""
 
-    title: "Watch List"
+    title: listName
 
     supportsRefreshing: true
 
@@ -68,7 +68,7 @@ Kirigami.ScrollablePage {
         // TODO show error message visually
     }
 
-    function refreshData() {
+    function getListMembers() {
         const symbols = [];
         const sources = [];
         for (let i = 0; i < watchListModel.count; ++i) {
@@ -76,7 +76,14 @@ Kirigami.ScrollablePage {
             symbols.push(item.symbol);
             sources.push(item.source);
         }
-        Backend.getSymbolQuotes(symbols, sources)
+        return {
+            "symbols": symbols,
+            "sources": sources
+        };
+    }
+
+    function refreshData() {
+        Backend.getSymbolQuotesForList(root.listName)
         .then((results) => {
             for (let i in results) {
                 watchListModel.set(i, results[i]);
@@ -91,6 +98,12 @@ Kirigami.ScrollablePage {
         Backend.getSymbolQuotes([symbol], [source])
         .then((results) => {
             watchListModel.append(results[0]);
+            const members = root.getListMembers();
+            return Backend.saveWatchList(root.listName, members.symbols, members.sources);
         }).catch((error) => root.handleError);
+    }
+
+    Component.onCompleted: {
+        root.refreshing = true;
     }
 }

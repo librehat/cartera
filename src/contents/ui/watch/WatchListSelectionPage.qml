@@ -52,6 +52,10 @@ Kirigami.ScrollablePage {
 
         delegate: Kirigami.BasicListItem {
             label: name
+            onClicked: {
+                pageStack.pop(root);
+                pageStack.push("qrc:/watch/WatchListPage.qml", {"listName": name})
+            }
         }
     }
 

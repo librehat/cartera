@@ -10,11 +10,11 @@ feed::api api;
 BOOST_AUTO_TEST_CASE(get_bulk_quotes_in_order)
 {
     const auto results = api.get_quotes({
-        {"VOD.L", feed_source::YahooFinance},
-        {"ETHBTC", feed_source::Binance},
-        {"IBM", feed_source::YahooFinance},
-        {"BTCUSDT", feed_source::Binance},
-        {"MA", feed_source::YahooFinance}
+        position_identifier{feed_source::YahooFinance, {"VOD.L"}},
+        position_identifier{feed_source::Binance, {"ETHBTC"}},
+        position_identifier{feed_source::YahooFinance, {"IBM"}},
+        position_identifier{feed_source::Binance, {"BTCUSDT"}},
+        position_identifier{feed_source::YahooFinance, {"MA"}}
         });
     BOOST_REQUIRE_EQUAL(results.size(), 5);
     BOOST_CHECK_EQUAL(results[0].symbol, "VOD.L");

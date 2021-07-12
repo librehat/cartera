@@ -28,20 +28,6 @@ namespace cartera {
 namespace config {
 
 namespace {
-static std::string read_file(const fs::path& path)
-{
-    fs::ifstream f(path, std::ios::in | std::ios::binary);
-    const auto sz = fs::file_size(path);
-    std::string result(sz, '\0');
-    f.read(result.data(), sz);
-    return result;
-}
-
-static void write_file(const fs::path& path, const std::string& content)
-{
-    fs::ofstream f(path, std::ios::out | std::ios::binary);
-    f << content;
-}
 }  // close unnamed namespace
 
 json_configurator::json_configurator(const std::string& config_path)
@@ -69,10 +55,26 @@ void json_configurator::initialise()
     }
 
     // create empty valid configuration files if they don't exist
-    const fs::path watch_list_file_path(m_watch_list_config_file_path);
-    if (!fs::exists(watch_list_file_path)) {
-        write_file(watch_list_file_path, "[]");
+    if (!fs::exists(m_watch_list_config_file_path)) {
+        write_file(m_watch_list_config_file_path, "[]");
     }
+}
+
+std::string json_configurator::read_file(const std::string& path)
+{
+    std::lock_guard<std::mutex> file_guard(m_mutex);
+    fs::ifstream f(path, std::ios::in | std::ios::binary);
+    const auto sz = fs::file_size(path);
+    std::string result(sz, '\0');
+    f.read(result.data(), sz);
+    return result;
+}
+
+void json_configurator::write_file(const std::string& path, const std::string& content)
+{
+    std::lock_guard<std::mutex> file_guard(m_mutex);
+    fs::ofstream f(path, std::ios::out | std::ios::binary);
+    f << content;
 }
 
 std::vector<std::string> json_configurator::list_watch_lists()

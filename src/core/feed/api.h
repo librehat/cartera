@@ -20,6 +20,7 @@
 
 #include "basicfeed.h"
 #include "http/client.h"
+#include "types/positionidentifier.h"
 
 #include <array>
 #include <unordered_map>
@@ -41,7 +42,7 @@ public:
 
     quote get_quote(const std::string_view& symbol, feed_source source) const;
 
-    std::vector<quote> get_quotes(const std::vector<std::pair<std::string_view, feed_source>>& symbols) const;
+    std::vector<quote> get_quotes(const std::vector<position_identifier>& pis) const;
 
 private:
     simple_http_client m_http_client;
