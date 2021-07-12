@@ -30,6 +30,7 @@ namespace config {
 using watch_list_item = position_identifier;
 
 // JSON files backed configurations manager
+// Methods of this class are not thread-safe
 class json_configurator {
 public:
     // the current user must have read and write permission in 'config_path'

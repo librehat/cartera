@@ -1,8 +1,8 @@
-import QtQuick 2.12
-import QtQuick.Controls 2.12 as Controls
-import QtQuick.Layouts 1.11
-import org.kde.kirigami 2.10 as Kirigami
-import com.librehat.cartera 1.0
+import QtQuick 2.15
+import QtQuick.Controls 2.15
+import QtQuick.Layouts 1.15
+import org.kde.kirigami 2.15 as Kirigami
+import com.librehat.cartera 1.0 as Cartera
 import "qrc:/watch" as Watch
 
 Kirigami.ApplicationWindow {
@@ -11,6 +11,7 @@ Kirigami.ApplicationWindow {
     title: "Cartera"
 
     // Initial page to be loaded on app load
-    pageStack.initialPage: Watch.WatchListPage {
+    pageStack.initialPage: Watch.WatchListSelectionPage {
+        pageStack: root.pageStack
     }
 }

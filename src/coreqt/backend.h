@@ -20,6 +20,7 @@
 #include <QObject>
 #include <QJSValue>
 
+#include "config/jsonconfigurator.h"
 #include "feed/api.h"
 
 namespace cartera {
@@ -50,9 +51,12 @@ public:
     // A convenient API for the UI to retrieve necessary data for a watch list to display
     Q_INVOKABLE void getSymbolQuotesForWatchList(const QString& listName, const QJSValue& callback, const QJSValue& errorCb);
 
+    Q_INVOKABLE void getAllWatchListNames(const QJSValue& callback, const QJSValue& errorCb);
+
     Q_INVOKABLE void saveWatchList(const QString& listName, const QStringList& symbols, const QList<int>& sources, const QJSValue& errorCb);
 
 private:
+    config::json_configurator m_config;
     feed::api m_feedApi;
     QJSEngine* m_jsEngine;
 };

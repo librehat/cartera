@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
     KLocalizedString::setApplicationDomain("cartera");
     QCoreApplication::setOrganizationDomain("librehat.com");
-    QCoreApplication::setApplicationName("cartera");
+    QCoreApplication::setApplicationName("Cartera");
 
 #ifdef Q_OS_WINDOWS
     QQuickStyle::setStyle("Universal");

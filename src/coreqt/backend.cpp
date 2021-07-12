@@ -24,6 +24,7 @@
 #include <QtConcurrent>
 #include <QFutureWatcher>
 #include <QJSEngine>
+#include <QStandardPaths>
 #include <QtDebug>
 
 #define CREATE_WATCHER(RTYPE, CALLBACK, ERROR_CALLBACK) \
@@ -45,6 +46,7 @@ namespace cartera {
 
 Backend::Backend(QJSEngine* engine, QObject* parent)
     : QObject(parent)
+    , m_config(QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation).toStdString())
     , m_jsEngine(engine)
 {}
 
@@ -111,6 +113,22 @@ void Backend::getSymbolQuotes(const QStringList& symbols, const QList<int>& sour
         })
     );
 }
+    
+void Backend::getAllWatchListNames(const QJSValue& callback, const QJSValue& errorCb)
+{
+    CREATE_WATCHER(QStringList, callback, errorCb)
+    watcher->setFuture(
+        QtConcurrent::run([this]() -> QStringList {
+            const auto allLists = m_config.list_watch_lists();
+            QStringList out;
+            out.reserve(allLists.size());
+            for (const auto& listName : allLists) {
+                out.push_back(QString::fromStdString(listName));
+            }
+            return out;
+        })
+    );
+}
 
 void Backend::getSymbolQuotesForWatchList(const QString& listName, const QJSValue& callback, const QJSValue& errorCb)
 {
@@ -119,7 +137,23 @@ void Backend::getSymbolQuotesForWatchList(const QString& listName, const QJSValu
 
 void Backend::saveWatchList(const QString& listName, const QStringList& symbols, const QList<int>& sources, const QJSValue& errorCb)
 {
-    // TODO
+    std::vector<config::watch_list_item> listItems;
+    listItems.reserve(symbols.size());
+    for (const auto& [symbol, source] : boost::combine(symbols, sources)) {
+        listItems.emplace_back(
+            config::watch_list_item{
+                static_cast<feed_source>(source),
+                symbol.toStdString()
+            }
+        );
+    }
+    try {
+        m_config.save_watch_list_symbols(listName.toStdString(), listItems);
+    }
+    catch (const std::exception& e) {
+        QJSValue eCb(errorCb);
+        eCb.call(QJSValueList{ m_jsEngine->toScriptValue(QString(e.what())) });
+    }
 }
 
 }  // close cartera namespace

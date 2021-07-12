@@ -28,11 +28,27 @@ function searchSymbols(keyword) {
     });
 }
 
-
 function getSymbolQuotes(symbols, sources) {
     return new Promise((resolve, reject) => {
         Cartera.Backend.getSymbolQuotes(symbols, sources, resolve, (errorMsg) => {
             reject(new Error(errorMsg));
         });
+    });
+}
+
+function getAllWatchListNames() {
+    return new Promise((resolve, reject) => {
+        Cartera.Backend.getAllWatchListNames(resolve, (errorMsg) => {
+            reject(new Error(errorMsg));
+        });
+    });
+}
+
+function saveWatchList(listName, symbols, sources) {
+    return new Promise((resolve, reject) => {
+        Cartera.Backend.saveWatchList(listName, symbols, sources, (errorMsg) => {
+            reject(new Error(errorMsg));
+        });
+        resolve();
     });
 }
