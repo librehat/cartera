@@ -32,4 +32,4 @@ To run all the unit tests, run `ctest` in the building directory.
  - `main.cpp` is for the main application that instantiates required resources and launches the UI.
 
 ## License
-LGPLv3
+GPLv3
