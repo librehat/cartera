@@ -8,6 +8,14 @@
 
 #include "backend.h"
 
+#ifdef Q_OS_WIN
+#define FALLBACK_STYLE "Universal"
+#elif defined(Q_OS_ANDROID)
+#define FALLBACK_STYLE "Material"
+#else
+#define FALLBACK_STYLE "Fusion"
+#endif
+
 int main(int argc, char *argv[])
 {
     QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
@@ -16,9 +24,8 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationDomain("librehat.com");
     QCoreApplication::setApplicationName("Cartera");
 
-#ifdef Q_OS_WINDOWS
-    QQuickStyle::setStyle("Universal");
-#endif
+    QQuickStyle::setStyle("org.kde.desktop");
+    QQuickStyle::setFallbackStyle(FALLBACK_STYLE);
 
     QQmlApplicationEngine engine;
     qmlRegisterSingletonType<cartera::Backend>(
