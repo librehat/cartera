@@ -72,6 +72,20 @@ BOOST_AUTO_TEST_CASE(parse_financial_instrument_ETH_USD)
     BOOST_CHECK_EQUAL(result.price_decimal_places, 2);
 }
 
+BOOST_AUTO_TEST_CASE(parse_financial_instrument_MutualFund)
+{
+    const std::string json_filepath{ "./fixture/0P00006AA4.TW.json" };
+    const auto result = yahoo_parser::parse_financial_instrument(read_file(json_filepath));
+
+    BOOST_CHECK_EQUAL(result.symbol, "0P00006AA4.TW");
+    BOOST_CHECK_EQUAL(result.exchange_code, "TAI");
+    BOOST_CHECK_EQUAL(result.currency, "TWD");
+    BOOST_CHECK_EQUAL(result.short_name, "HSBC Taiwan Phoenix Fund A");
+    BOOST_CHECK_EQUAL(result.long_name, "HSBC Taiwan Phoenix Fund A");
+    BOOST_CHECK_EQUAL(result.type, cartera::asset_class::MutualFund);
+    BOOST_CHECK_EQUAL(result.price_decimal_places, 2);
+}
+
 BOOST_AUTO_TEST_CASE(parse_quote_IBM)
 {
     const std::string json_filepath{ "./fixture/IBM.json" };
@@ -79,14 +93,17 @@ BOOST_AUTO_TEST_CASE(parse_quote_IBM)
 
     BOOST_CHECK_EQUAL(result.symbol, "IBM");
     BOOST_CHECK_CLOSE(result.current_price, 136.38, 1e-8);
-    BOOST_CHECK_CLOSE(result.day_high_price, 136.48, 1e-8);
-    BOOST_CHECK_CLOSE(result.day_low_price, 133.12, 1e-8);
-    BOOST_CHECK_CLOSE(result.day_open_price, 133.29, 1e-8);
+    BOOST_REQUIRE(result.day_high_price.has_value());
+    BOOST_CHECK_CLOSE(result.day_high_price.value(), 136.48, 1e-8);
+    BOOST_REQUIRE(result.day_low_price.has_value());
+    BOOST_CHECK_CLOSE(result.day_low_price.value(), 133.12, 1e-8);
+    BOOST_REQUIRE(result.day_open_price.has_value());
+    BOOST_CHECK_CLOSE(result.day_open_price.value(), 133.29, 1e-8);
     BOOST_CHECK(result.is_market_open);
     BOOST_REQUIRE(result.market_cap.has_value());
     BOOST_CHECK_EQUAL(result.market_cap.value(), double(121868353536));
     BOOST_CHECK_CLOSE(result.prev_day_close_price, 133.07, 1e-8);
-    BOOST_CHECK_EQUAL(result.volume, 5567592);
+    BOOST_CHECK_EQUAL(result.volume.value(), 5567592);
     BOOST_CHECK_EQUAL(std::chrono::duration_cast<std::chrono::seconds>(result.updated_time.time_since_epoch()).count(), 1616788802);
 }
 
@@ -97,15 +114,32 @@ BOOST_AUTO_TEST_CASE(parse_quote_ETH_USD)
 
     BOOST_CHECK_EQUAL(result.symbol, "ETH-USD");
     BOOST_CHECK_CLOSE(result.current_price, 2358.923, 1e-8);
-    BOOST_CHECK_CLOSE(result.day_high_price, 2396.8665, 1e-8);
-    BOOST_CHECK_CLOSE(result.day_low_price, 2298.4412, 1e-8);
-    BOOST_CHECK_CLOSE(result.day_open_price, 2317.4314, 1e-8);
+    BOOST_REQUIRE(result.day_high_price.has_value());
+    BOOST_CHECK_CLOSE(result.day_high_price.value(), 2396.8665, 1e-8);
+    BOOST_REQUIRE(result.day_low_price.has_value());
+    BOOST_CHECK_CLOSE(result.day_low_price.value(), 2298.4412, 1e-8);
+    BOOST_REQUIRE(result.day_open_price.has_value());
+    BOOST_CHECK_CLOSE(result.day_open_price.value(), 2317.4314, 1e-8);
     BOOST_CHECK(result.is_market_open);
     BOOST_REQUIRE(result.market_cap.has_value());
     BOOST_CHECK_EQUAL(result.market_cap.value(), double(275044761600));
     BOOST_CHECK_CLOSE(result.prev_day_close_price, 2317.4314, 1e-8);
-    BOOST_CHECK_EQUAL(result.volume, 23386800128);
+    BOOST_CHECK_EQUAL(result.volume.value(), 23386800128);
     BOOST_CHECK_EQUAL(std::chrono::duration_cast<std::chrono::seconds>(result.updated_time.time_since_epoch()).count(), 1625680262);
+}
+
+BOOST_AUTO_TEST_CASE(parse_quote_MutualFund)
+{
+    const std::string json_filepath{ "./fixture/0P00006AA4.TW.json" };
+    const auto result = yahoo_parser::parse_quote(read_file(json_filepath));
+
+    BOOST_CHECK_EQUAL(result.symbol, "0P00006AA4.TW");
+    BOOST_CHECK_CLOSE(result.current_price, 92.77, 1e-8);
+    BOOST_CHECK(!result.day_high_price.has_value());
+    BOOST_CHECK(!result.day_low_price.has_value());
+    BOOST_CHECK(!result.day_open_price.has_value());
+    BOOST_CHECK(!result.volume.has_value());
+    BOOST_CHECK_CLOSE(result.prev_day_close_price, 91.77, 1e-8);
 }
 
 BOOST_AUTO_TEST_CASE(parse_quotes)
@@ -116,10 +150,13 @@ BOOST_AUTO_TEST_CASE(parse_quotes)
     BOOST_REQUIRE_EQUAL(result.size(), 2);
     BOOST_CHECK_EQUAL(result[0].symbol, "IBM");
     BOOST_CHECK_CLOSE(result[0].current_price, 141.425, 1e-8);
-    BOOST_CHECK_CLOSE(result[0].volume, 262576, 1e-8);
-    BOOST_CHECK_CLOSE(result[0].day_high_price, 141.65, 1e-8);
-    BOOST_CHECK_CLOSE(result[0].day_low_price, 141.0406, 1e-8);
-    BOOST_CHECK_CLOSE(result[0].day_open_price, 137.78, 1e-8);
+    BOOST_CHECK_CLOSE(result[0].volume.value(), 262576, 1e-8);
+    BOOST_REQUIRE(result[0].day_high_price.has_value());
+    BOOST_CHECK_CLOSE(result[0].day_high_price.value(), 141.65, 1e-8);
+    BOOST_REQUIRE(result[0].day_low_price.has_value());
+    BOOST_CHECK_CLOSE(result[0].day_low_price.value(), 141.0406, 1e-8);
+    BOOST_REQUIRE(result[0].day_open_price.has_value());
+    BOOST_CHECK_CLOSE(result[0].day_open_price.value(), 137.78, 1e-8);
     BOOST_CHECK_CLOSE(result[0].prev_day_close_price, 140.74, 1e-8);
     BOOST_CHECK_EQUAL(result[1].symbol, "VOD.L");
 }
@@ -129,17 +166,17 @@ BOOST_AUTO_TEST_CASE(parse_detail_IBM)
     const std::string json_filepath{ "./fixture/IBM_detail.json" };
     const auto result = yahoo_parser::parse_detail(read_file(json_filepath));
 
-    BOOST_CHECK_CLOSE(result.day_high_price, 141.9597, 1e-8);
-    BOOST_CHECK_CLOSE(result.day_low_price, 140.115, 1e-8);
-    BOOST_CHECK_CLOSE(result.day_open_price, 141.43, 1e-8);
-    BOOST_CHECK_CLOSE(result.bid_price, 140.87, 1e-8);
-    BOOST_CHECK_CLOSE(result.bid_qty, 900, 1e-8);
-    BOOST_CHECK_CLOSE(result.ask_price, 140.89, 1e-8);
-    BOOST_CHECK_CLOSE(result.ask_qty, 800, 1e-8);
+    BOOST_CHECK_CLOSE(result.day_high_price.value(), 141.9597, 1e-8);
+    BOOST_CHECK_CLOSE(result.day_low_price.value(), 140.115, 1e-8);
+    BOOST_CHECK_CLOSE(result.day_open_price.value(), 141.43, 1e-8);
+    BOOST_CHECK_CLOSE(result.bid_price.value(), 140.87, 1e-8);
+    BOOST_CHECK_CLOSE(result.bid_qty.value(), 900, 1e-8);
+    BOOST_CHECK_CLOSE(result.ask_price.value(), 140.89, 1e-8);
+    BOOST_CHECK_CLOSE(result.ask_qty.value(), 800, 1e-8);
     BOOST_REQUIRE(result.market_cap.has_value());
     BOOST_CHECK_EQUAL(result.market_cap.value(), double(125818134528));
     BOOST_CHECK_CLOSE(result.prev_day_close_price, 141.52, 1e-8);
-    BOOST_CHECK_CLOSE(result.volume, 1355584, 1e-8);
+    BOOST_CHECK_CLOSE(result.volume.value(), 1355584, 1e-8);
     BOOST_REQUIRE(result.average_ten_day_volume.has_value());
     BOOST_CHECK_CLOSE(result.average_ten_day_volume.value(), 7671100, 1e-8);
     BOOST_REQUIRE(result.beta.has_value());
@@ -161,16 +198,16 @@ BOOST_AUTO_TEST_CASE(parse_detail_SPX)
     const std::string json_filepath{ "./fixture/SPX_detail.json" };
     const auto result = yahoo_parser::parse_detail(read_file(json_filepath));
 
-    BOOST_CHECK_CLOSE(result.day_high_price, 4381.46, 1e-8);
-    BOOST_CHECK_CLOSE(result.day_low_price, 4364.03, 1e-8);
-    BOOST_CHECK_CLOSE(result.day_open_price, 4372.41, 1e-8);
-    BOOST_CHECK_CLOSE(result.bid_price, 4378.98, 1e-8);
-    BOOST_CHECK_CLOSE(result.bid_qty, 0, 1e-8);
-    BOOST_CHECK_CLOSE(result.ask_price, 4380.43, 1e-8);
-    BOOST_CHECK_CLOSE(result.ask_qty, 0, 1e-8);
+    BOOST_CHECK_CLOSE(result.day_high_price.value(), 4381.46, 1e-8);
+    BOOST_CHECK_CLOSE(result.day_low_price.value(), 4364.03, 1e-8);
+    BOOST_CHECK_CLOSE(result.day_open_price.value(), 4372.41, 1e-8);
+    BOOST_CHECK_CLOSE(result.bid_price.value(), 4378.98, 1e-8);
+    BOOST_CHECK_CLOSE(result.bid_qty.value(), 0, 1e-8);
+    BOOST_CHECK_CLOSE(result.ask_price.value(), 4380.43, 1e-8);
+    BOOST_CHECK_CLOSE(result.ask_qty.value(), 0, 1e-8);
     BOOST_CHECK(!result.market_cap.has_value());
     BOOST_CHECK_CLOSE(result.prev_day_close_price, 4369.55, 1e-8);
-    BOOST_CHECK_CLOSE(result.volume, 738562126, 1e-8);
+    BOOST_CHECK_CLOSE(result.volume.value(), 738562126, 1e-8);
     BOOST_CHECK(!result.average_ten_day_volume.has_value());
     BOOST_CHECK(!result.beta.has_value());
     BOOST_REQUIRE(result.fifty_two_week_high_price.has_value());
@@ -201,14 +238,14 @@ BOOST_AUTO_TEST_CASE(parse_quote_BTCUSDT_Binance)
     const auto result = binance_parser::parse_quote(read_file(json_filepath));
 
     BOOST_CHECK_CLOSE(result.current_price, 34617.7, 1e-8);
-    BOOST_CHECK_CLOSE(result.day_high_price, 35059.09, 1e-8);
-    BOOST_CHECK_CLOSE(result.day_low_price, 33532.0, 1e-8);
-    BOOST_CHECK_CLOSE(result.day_open_price, 34112.66, 1e-8);
+    BOOST_CHECK_CLOSE(result.day_high_price.value(), 35059.09, 1e-8);
+    BOOST_CHECK_CLOSE(result.day_low_price.value(), 33532.0, 1e-8);
+    BOOST_CHECK_CLOSE(result.day_open_price.value(), 34112.66, 1e-8);
     BOOST_CHECK(result.is_market_open);
     BOOST_CHECK(!result.market_cap.has_value());
     BOOST_CHECK_CLOSE(result.prev_day_close_price, 34110.19, 1e-8);
     BOOST_CHECK_EQUAL(result.symbol, "BTCUSDT");
-    BOOST_CHECK_CLOSE(result.volume, 53496.190443, 1e-8);
+    BOOST_CHECK_CLOSE(result.volume.value(), 53496.190443, 1e-8);
 }
 
 BOOST_AUTO_TEST_CASE(parse_detail_BTCUSDT_Binance)
@@ -216,16 +253,16 @@ BOOST_AUTO_TEST_CASE(parse_detail_BTCUSDT_Binance)
     const std::string json_filepath{ "./fixture/BTCUSDT_24hr.json" };
     const auto result = binance_parser::parse_detail(read_file(json_filepath));
 
-    BOOST_CHECK_CLOSE(result.day_high_price, 35059.09, 1e-8);
-    BOOST_CHECK_CLOSE(result.day_low_price, 33532.0, 1e-8);
-    BOOST_CHECK_CLOSE(result.day_open_price, 34112.66, 1e-8);
-    BOOST_CHECK_CLOSE(result.bid_price, 34617.6, 1e-8);
-    BOOST_CHECK_CLOSE(result.bid_qty, 0.383711, 1e-8);
-    BOOST_CHECK_CLOSE(result.ask_price, 34617.7, 1e-8);
-    BOOST_CHECK_CLOSE(result.ask_qty, 0.605023, 1e-8);
+    BOOST_CHECK_CLOSE(result.day_high_price.value(), 35059.09, 1e-8);
+    BOOST_CHECK_CLOSE(result.day_low_price.value(), 33532.0, 1e-8);
+    BOOST_CHECK_CLOSE(result.day_open_price.value(), 34112.66, 1e-8);
+    BOOST_CHECK_CLOSE(result.bid_price.value(), 34617.6, 1e-8);
+    BOOST_CHECK_CLOSE(result.bid_qty.value(), 0.383711, 1e-8);
+    BOOST_CHECK_CLOSE(result.ask_price.value(), 34617.7, 1e-8);
+    BOOST_CHECK_CLOSE(result.ask_qty.value(), 0.605023, 1e-8);
     BOOST_CHECK(!result.market_cap.has_value());
     BOOST_CHECK_CLOSE(result.prev_day_close_price, 34110.19, 1e-8);
-    BOOST_CHECK_CLOSE(result.volume, 53496.190443, 1e-8);
+    BOOST_CHECK_CLOSE(result.volume.value(), 53496.190443, 1e-8);
     BOOST_CHECK(!result.average_ten_day_volume.has_value());
     BOOST_CHECK(!result.beta.has_value());
     BOOST_CHECK(!result.fifty_two_week_high_price.has_value());

@@ -94,12 +94,12 @@ struct quote
     datetime updated_time;
     std::string symbol;
     feed_source source;
-    double day_low_price;
-    double day_high_price;
-    double day_open_price;
+    std::optional<double> day_low_price;
+    std::optional<double> day_high_price;
+    std::optional<double> day_open_price;
     double prev_day_close_price;
     double current_price;
-    double volume;
+    std::optional<double> volume;
     double is_market_open;
     std::optional<double> market_cap;  // nullable double
 };
@@ -107,15 +107,15 @@ struct quote
 
 struct symbol_detail
 {
-    double day_low_price;
-    double day_high_price;
-    double day_open_price;
+    std::optional<double> day_low_price;
+    std::optional<double> day_high_price;
+    std::optional<double> day_open_price;
     double prev_day_close_price;
-    double bid_price;
-    double bid_qty;
-    double ask_price;
-    double ask_qty;
-    double volume;
+    std::optional<double> bid_price;
+    std::optional<double> bid_qty;
+    std::optional<double> ask_price;
+    std::optional<double> ask_qty;
+    std::optional<double> volume;
     std::optional<double> average_ten_day_volume;
     std::optional<double> fifty_two_week_high_price;
     std::optional<double> fifty_two_week_low_price;
@@ -125,6 +125,13 @@ struct symbol_detail
     std::optional<datetime> ex_dividend_date;
     std::optional<double> beta;
 };
+
+template<typename T>
+std::ostream operator<<(std::ostream& os, const std::optional<T>& val)
+{
+    os << val.has_value() ? val.value() : "null";
+    return os;
+}
 
 }
 

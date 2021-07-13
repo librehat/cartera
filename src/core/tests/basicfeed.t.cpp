@@ -19,12 +19,11 @@ BOOST_AUTO_TEST_CASE(basic_feed_yahoo_finance_quote)
 {
     const quote res = basic_feed::resolve_quote<feed_source::YahooFinance>(client, "IBM");
     BOOST_CHECK_EQUAL(res.symbol, "IBM");
-    BOOST_CHECK(res.market_cap.has_value());
-    if (res.market_cap.has_value()) {
-        BOOST_CHECK_GT(res.market_cap.value(), 1);
-    }
+    BOOST_REQUIRE(res.market_cap.has_value());
+    BOOST_CHECK_GT(res.market_cap.value(), 1);
     BOOST_CHECK_GT(res.current_price, 0);
-    BOOST_CHECK_GT(res.volume, 0);
+    BOOST_REQUIRE(res.volume.has_value());
+    BOOST_CHECK_GT(res.volume.value(), 0);
 }
 
 BOOST_AUTO_TEST_CASE(basic_feed_yahoo_finance_search)
@@ -54,7 +53,8 @@ BOOST_AUTO_TEST_CASE(basic_feed_binance_quote)
     BOOST_CHECK_EQUAL(res.symbol, "DOGEUSDT");
     BOOST_CHECK(!res.market_cap.has_value());
     BOOST_CHECK_GT(res.current_price, 0);
-    BOOST_CHECK_GT(res.volume, 0);
+    BOOST_REQUIRE(res.volume.has_value());
+    BOOST_CHECK_GT(res.volume.value(), 0);
 }
 
 BOOST_AUTO_TEST_CASE(basic_feed_binance_search)

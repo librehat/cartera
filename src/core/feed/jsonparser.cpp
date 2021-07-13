@@ -45,6 +45,9 @@ asset_class asset_class_from_quote_type(const STRING& quote_type)
     if (quote_type == "CRYPTOCURRENCY") {
         return asset_class::CryptoCurrency;
     }
+    if (quote_type == "MUTUALFUND") {
+        return asset_class::MutualFund;
+    }
     // TODO: complete the mapping
     return asset_class::Other;
 }
@@ -86,8 +89,7 @@ std::optional<RET> get_optional_json_value(
 financial_instrument json_parser<feed_source::YahooFinance>::parse_financial_instrument(const std::string& data)
 {
     const json::value document = json::parse(data);
-    const json::object& root = document.as_object();
-    const json::object& quote_summary = root.at("quoteSummary").as_object();
+    const json::object& quote_summary = document.at("quoteSummary").as_object();
     if (quote_summary.contains("error") && !quote_summary.at("error").is_null()) {
         throw cartera_exception(quote_summary.at("error").as_string().data());
     }
@@ -110,8 +112,7 @@ financial_instrument json_parser<feed_source::YahooFinance>::parse_financial_ins
 quote json_parser<feed_source::YahooFinance>::parse_quote(const std::string& data)
 {
     const json::value document = json::parse(data);
-    const json::object& root = document.as_object();
-    const json::object& quote_summary = root.at("quoteSummary").as_object();
+    const json::object& quote_summary = document.at("quoteSummary").as_object();
     if (quote_summary.contains("error") && !quote_summary.at("error").is_null()) {
         throw cartera_exception(quote_summary.at("error").as_string().data());
     }
@@ -132,12 +133,12 @@ quote json_parser<feed_source::YahooFinance>::parse_quote(const std::string& dat
         datetime(std::chrono::seconds(epoch_s)),
         quote_result.at("symbol").as_string().data(),
         feed_source::YahooFinance,
-        json_value_as_double(quote_result.at("regularMarketDayLow").at("raw")),
-        json_value_as_double(quote_result.at("regularMarketDayHigh").at("raw")),
-        json_value_as_double(quote_result.at("regularMarketOpen").at("raw")),
+        get_optional_json_value<double>(quote_result.at("regularMarketDayLow"), "raw", json_value_as_double),
+        get_optional_json_value<double>(quote_result.at("regularMarketDayHigh"), "raw", json_value_as_double),
+        get_optional_json_value<double>(quote_result.at("regularMarketOpen"), "raw", json_value_as_double),
         json_value_as_double(quote_result.at("regularMarketPreviousClose").at("raw")),
         json_value_as_double(quote_result.at("regularMarketPrice").at("raw")),
-        json_value_as_double(quote_result.at("regularMarketVolume").at("raw")),
+        get_optional_json_value<double>(quote_result.at("regularMarketVolume"), "raw", json_value_as_double),
         true, // FIXME
         market_cap_val,
     };
@@ -164,12 +165,12 @@ std::vector<quote> json_parser<feed_source::YahooFinance>::parse_quotes(const st
                 datetime(std::chrono::seconds(result.at("regularMarketTime").as_int64())),
                 result.at("symbol").as_string().data(),
                 feed_source::YahooFinance,
-                json_value_as_double(result.at("regularMarketDayLow")),
-                json_value_as_double(result.at("regularMarketDayHigh")),
-                json_value_as_double(result.at("regularMarketOpen")),
+                get_optional_json_value<double>(result, "regularMarketDayLow", json_value_as_double),
+                get_optional_json_value<double>(result, "regularMarketDayHigh", json_value_as_double),
+                get_optional_json_value<double>(result, "regularMarketOpen", json_value_as_double),
                 json_value_as_double(result.at("regularMarketPreviousClose")),
                 json_value_as_double(result.at("regularMarketPrice")),
-                json_value_as_double(result.at("regularMarketVolume")),
+                get_optional_json_value<double>(result, "regularMarketVolume", json_value_as_double),
                 true, // FIXME
                 market_cap_val,
             }
@@ -190,15 +191,15 @@ symbol_detail json_parser<feed_source::YahooFinance>::parse_detail(const std::st
     auto ex_dividend_date = get_optional_json_value<datetime>(detail.at("exDividendDate"), "raw", [](const json::value& val) { return datetime(std::chrono::seconds(val.as_int64())); });
 
     return symbol_detail{
-        json_value_as_double(detail.at("regularMarketDayLow").at("raw")),
-        json_value_as_double(detail.at("regularMarketDayHigh").at("raw")),
-        json_value_as_double(detail.at("regularMarketOpen").at("raw")),
+        get_optional_json_value<double>(detail.at("regularMarketDayLow"), "raw", json_value_as_double),
+        get_optional_json_value<double>(detail.at("regularMarketDayHigh"), "raw", json_value_as_double),
+        get_optional_json_value<double>(detail.at("regularMarketOpen"), "raw", json_value_as_double),
         json_value_as_double(detail.at("regularMarketPreviousClose").at("raw")),
-        json_value_as_double(detail.at("bid").at("raw")),
-        json_value_as_double(detail.at("bidSize").at("raw")),
-        json_value_as_double(detail.at("ask").at("raw")),
-        json_value_as_double(detail.at("askSize").at("raw")),
-        json_value_as_double(detail.at("regularMarketVolume").at("raw")),
+        get_optional_json_value<double>(detail.at("bid"), "raw", json_value_as_double),
+        get_optional_json_value<double>(detail.at("bidSize"), "raw", json_value_as_double),
+        get_optional_json_value<double>(detail.at("ask"), "raw", json_value_as_double),
+        get_optional_json_value<double>(detail.at("askSize"), "raw", json_value_as_double),
+        get_optional_json_value<double>(detail.at("regularMarketVolume"), "raw", json_value_as_double),
         get_optional_json_value<double>(detail.at("averageVolume10days"), "raw", json_value_as_double),
         get_optional_json_value<double>(detail.at("fiftyTwoWeekHigh"), "raw", json_value_as_double),
         get_optional_json_value<double>(detail.at("fiftyTwoWeekLow"), "raw", json_value_as_double),

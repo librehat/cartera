@@ -31,6 +31,13 @@
 #define ENUM_CLASS_PROP_IMPL(READ_FUNC, MEM_NAME) \
     inline int READ_FUNC() const { return static_cast<int>( MEM_NAME ); }
 
+#define OPTIONAL_PROP_IMPL(READ_FUNC, MEM_NAME) \
+    inline QVariant READ_FUNC() const { \
+        QVariant res; \
+        if (MEM_NAME.has_value()) { res.setValue(MEM_NAME.value()); } \
+        return res; \
+    }
+
 #define GADGET_BOILER_PLATE_DECL(CLASS, BASE) \
 public: \
     CLASS() = default; \
@@ -93,12 +100,12 @@ class Quote : public quote {
     Q_PROPERTY(QDateTime updatedTime READ getUpdatedTime)
     Q_PROPERTY(QString symbol READ getSymbol)
     Q_PROPERTY(int source READ getSource)
-    Q_PROPERTY(double dayLowPrice MEMBER day_low_price)
-    Q_PROPERTY(double dayHighPrice MEMBER day_high_price)
-    Q_PROPERTY(double dayOpenPrice MEMBER day_open_price)
+    Q_PROPERTY(QVariant dayLowPrice READ getDayLow)
+    Q_PROPERTY(QVariant dayHighPrice READ getDayHigh)
+    Q_PROPERTY(QVariant dayOpenPrice READ getDayOpen)
     Q_PROPERTY(double prevDayClosePrice MEMBER prev_day_close_price)
     Q_PROPERTY(double currentPrice MEMBER current_price)
-    Q_PROPERTY(double volume MEMBER volume)
+    Q_PROPERTY(QVariant volume READ getVolume)
     Q_PROPERTY(double isMarketOpen MEMBER is_market_open)
     Q_PROPERTY(QVariant marketCap READ getMarketCap)
 
@@ -106,6 +113,11 @@ class Quote : public quote {
 
     STL_STRING_PROP_IMPL(getSymbol, symbol)
     ENUM_CLASS_PROP_IMPL(getSource, source)
+    OPTIONAL_PROP_IMPL(getDayLow, day_low_price)
+    OPTIONAL_PROP_IMPL(getDayHigh, day_high_price)
+    OPTIONAL_PROP_IMPL(getDayOpen, day_open_price)
+    OPTIONAL_PROP_IMPL(getVolume, volume)
+    OPTIONAL_PROP_IMPL(getMarketCap, market_cap)
 
     inline QDateTime getUpdatedTime() const {
         return QDateTime::fromMSecsSinceEpoch(
@@ -113,14 +125,6 @@ class Quote : public quote {
                 updated_time.time_since_epoch()
             ).count()
         );
-    }
-
-    inline QVariant getMarketCap() const {
-        QVariant res;
-        if (market_cap.has_value()) {
-            res.setValue(market_cap.value());
-        }
-        return res;
     }
 };
 
@@ -144,5 +148,6 @@ Q_DECLARE_METATYPE(cartera::PositionIdentifier)
 
 #undef STL_STRING_PROP_IMPL
 #undef ENUM_CLASS_PROP_IMPL
+#undef OPTIONAL_PROP_IMPL
 #undef GADGET_BOILER_PLATE_DECL
 #endif  // CARTERA_COREQT_TYPES_H
