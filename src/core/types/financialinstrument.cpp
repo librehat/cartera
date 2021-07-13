@@ -56,12 +56,13 @@ std::ostream& operator<<(std::ostream& os, const financial_instrument& rhs) {
     os << " symbol=" << rhs.symbol;
     os << " currency=" << rhs.currency;
     os << " exchange=" << rhs.exchange_code;
-    os << " name=" << rhs.short_name << " (" << rhs.long_name << ") }";
+    os << " name=" << rhs.short_name << " (" << rhs.long_name << ")"
+       << " priceDecimalPlaces=" << rhs.price_decimal_places << " }";
     return os;
 }
 
 bool operator==(const financial_instrument& lhs, const financial_instrument& rhs) {
-    return lhs.type == rhs.type && lhs.symbol == rhs.symbol && lhs.currency == rhs.currency && lhs.exchange_code == rhs.exchange_code && lhs.short_name == rhs.short_name && lhs.long_name == rhs.long_name;
+    return lhs.type == rhs.type && lhs.symbol == rhs.symbol && lhs.currency == rhs.currency && lhs.exchange_code == rhs.exchange_code && lhs.short_name == rhs.short_name && lhs.long_name == rhs.long_name && lhs.price_decimal_places == rhs.price_decimal_places;
 }
 
 bool operator!=(const financial_instrument& lhs, const financial_instrument& rhs) {

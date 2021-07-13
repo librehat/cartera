@@ -8,7 +8,8 @@ import "qrc:/search" as Search
 Kirigami.ScrollablePage {
     id: root
 
-    property string listName: ""
+    required property string listName
+    required property var pageStack
 
     title: listName
 
@@ -51,7 +52,12 @@ Kirigami.ScrollablePage {
 
         model: watchListModel
 
-        delegate: WatchListItem {}
+        delegate: WatchListItem {
+            onClicked: {
+                pageStack.pop(root);
+                pageStack.push("qrc:/watch/DetailsPage.qml", {"symbol": symbol, "source": source});
+            }
+        }
     }
 
     Connections {

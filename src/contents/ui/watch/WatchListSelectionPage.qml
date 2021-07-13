@@ -54,7 +54,7 @@ Kirigami.ScrollablePage {
             label: name
             onClicked: {
                 pageStack.pop(root);
-                pageStack.push("qrc:/watch/WatchListPage.qml", {"listName": name})
+                pageStack.push("qrc:/watch/WatchListPage.qml", {"listName": name, "pageStack": root.pageStack});
             }
         }
     }

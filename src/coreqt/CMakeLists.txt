@@ -1,4 +1,4 @@
-add_library(carteracoreqt STATIC "backend.cpp" "types.cpp")
+add_library(carteracoreqt STATIC "backend.cpp" "types/types.cpp" "types/symbolquote.cpp" "types/symboldetails.cpp")
 
 find_package(Qt5 ${QT_MIN_VERSION} REQUIRED NO_MODULE COMPONENTS Core Qml Concurrent)
 find_package(Boost REQUIRED)

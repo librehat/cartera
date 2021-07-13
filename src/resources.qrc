@@ -6,6 +6,7 @@
         <file alias="watch/WatchListPage.qml">contents/ui/watch/WatchListPage.qml</file>
         <file alias="search/SearchDialog.qml">contents/ui/search/SearchDialog.qml</file>
         <file alias="watch/WatchListSelectionPage.qml">contents/ui/watch/WatchListSelectionPage.qml</file>
+        <file alias="watch/DetailsPage.qml">contents/ui/watch/DetailsPage.qml</file>
     </qresource>
     <qresource prefix="/code">
         <file alias="backend.js">contents/code/backend.js</file>

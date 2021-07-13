@@ -68,6 +68,19 @@ double json_value_as_double(const json::value& val)
     throw cartera_exception("Cannot retrieve double from the JSON value");
 }
 
+template<typename RET>
+std::optional<RET> get_optional_json_value(
+    const json::value& val,
+    const json::string_view& key,
+    const std::function<RET(const json::value&)>& convert)
+{
+    // TODO make it generic to take 'path' instead of a single 'key'
+    if (val.is_object() && val.get_object().contains(key)) {
+        return convert(val.get_object().at(key));
+    }
+    return {};
+}
+
 }
 
 financial_instrument json_parser<feed_source::YahooFinance>::parse_financial_instrument(const std::string& data)
@@ -90,6 +103,7 @@ financial_instrument json_parser<feed_source::YahooFinance>::parse_financial_ins
         quote_result.at("exchange").as_string().data(),
         long_name.as_string().data(),
         quote_result.at("shortName").as_string().data(),
+        static_cast<int>(quote_result.at("priceHint").at("raw").as_int64()),
     };
 }
 
@@ -113,7 +127,6 @@ quote json_parser<feed_source::YahooFinance>::parse_quote(const std::string& dat
         }
     }
     const int64_t epoch_s = quote_result.at("regularMarketTime").as_int64();
-    const json::value& market_volume = quote_result.at("regularMarketVolume").at("raw");
 
     return quote{
         datetime(std::chrono::seconds(epoch_s)),
@@ -124,7 +137,7 @@ quote json_parser<feed_source::YahooFinance>::parse_quote(const std::string& dat
         json_value_as_double(quote_result.at("regularMarketOpen").at("raw")),
         json_value_as_double(quote_result.at("regularMarketPreviousClose").at("raw")),
         json_value_as_double(quote_result.at("regularMarketPrice").at("raw")),
-        json_value_as_double(market_volume),
+        json_value_as_double(quote_result.at("regularMarketVolume").at("raw")),
         true, // FIXME
         market_cap_val,
     };
@@ -163,6 +176,38 @@ std::vector<quote> json_parser<feed_source::YahooFinance>::parse_quotes(const st
         );
     }
     return out;
+}
+
+symbol_detail json_parser<feed_source::YahooFinance>::parse_detail(const std::string& data)
+{
+    const json::value document = json::parse(data);
+    const json::object& quote_summary = document.at("quoteSummary").as_object();
+    if (quote_summary.contains("error") && !quote_summary.at("error").is_null()) {
+        throw cartera_exception(quote_summary.at("error").as_string().data());
+    }
+    const json::array& result = quote_summary.at("result").as_array();
+    const json::object& detail = result.at(0).at("summaryDetail").as_object();
+    auto ex_dividend_date = get_optional_json_value<datetime>(detail.at("exDividendDate"), "raw", [](const json::value& val) { return datetime(std::chrono::seconds(val.as_int64())); });
+
+    return symbol_detail{
+        json_value_as_double(detail.at("regularMarketDayLow").at("raw")),
+        json_value_as_double(detail.at("regularMarketDayHigh").at("raw")),
+        json_value_as_double(detail.at("regularMarketOpen").at("raw")),
+        json_value_as_double(detail.at("regularMarketPreviousClose").at("raw")),
+        json_value_as_double(detail.at("bid").at("raw")),
+        json_value_as_double(detail.at("bidSize").at("raw")),
+        json_value_as_double(detail.at("ask").at("raw")),
+        json_value_as_double(detail.at("askSize").at("raw")),
+        json_value_as_double(detail.at("regularMarketVolume").at("raw")),
+        get_optional_json_value<double>(detail.at("averageVolume10days"), "raw", json_value_as_double),
+        get_optional_json_value<double>(detail.at("fiftyTwoWeekHigh"), "raw", json_value_as_double),
+        get_optional_json_value<double>(detail.at("fiftyTwoWeekLow"), "raw", json_value_as_double),
+        get_optional_json_value<double>(detail.at("marketCap"), "raw", json_value_as_double),
+        get_optional_json_value<double>(detail.at("dividendRate"), "raw", json_value_as_double),
+        get_optional_json_value<double>(detail.at("dividendYield"), "raw", json_value_as_double),
+        std::move(ex_dividend_date),
+        get_optional_json_value<double>(detail.at("beta"), "raw", json_value_as_double)
+    };
 }
 
 std::vector<symbol_search_result> json_parser<feed_source::YahooFinance>::parse_search_quote(const std::string& data)
@@ -206,6 +251,7 @@ financial_instrument json_parser<feed_source::Binance>::parse_financial_instrume
         {"BIN"}, // FIXME, a proper exchange code for Binance
         name,
         name,
+        static_cast<int>(symbol.at("quotePrecision").as_int64()),
     };
 }
 
@@ -225,6 +271,30 @@ quote json_parser<feed_source::Binance>::parse_quote(const std::string& data)
         json_value_as_double(document.at("volume")),
         true, // cryptocurrency is traded 24*7
         std::optional<double>(),
+    };
+}
+
+symbol_detail json_parser<feed_source::Binance>::parse_detail(const std::string& data)
+{
+    const json::value document = json::parse(data);
+    return {
+        json_value_as_double(document.at("lowPrice")),
+        json_value_as_double(document.at("highPrice")),
+        json_value_as_double(document.at("openPrice")),
+        json_value_as_double(document.at("prevClosePrice")),
+        json_value_as_double(document.at("bidPrice")),
+        json_value_as_double(document.at("bidQty")),
+        json_value_as_double(document.at("askPrice")),
+        json_value_as_double(document.at("askQty")),
+        json_value_as_double(document.at("volume")),
+        std::optional<double>{},
+        std::optional<double>{},
+        std::optional<double>{},
+        std::optional<double>{},
+        std::optional<double>{},
+        std::optional<double>{},
+        std::optional<datetime>{},
+        std::optional<double>{}
     };
 }
 

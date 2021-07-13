@@ -49,6 +49,13 @@ struct basic_feed
     }
 
     template<feed_source SOURCE>
+    static symbol_detail resolve_detail(const simple_http_client& client, const std::string_view& symbol)
+    {
+        const std::string resp = client.get(details::urls<SOURCE>::detail(symbol));
+        return json_parser<SOURCE>::parse_detail(resp);
+    }
+
+    template<feed_source SOURCE>
     static std::vector<quote> resolve_quotes(const simple_http_client& client, const std::vector<std::string_view>& symbols)
     {
         // The default implementation simply calls 'resolve_quote' multiple times.
@@ -89,6 +96,11 @@ struct urls<feed_source::YahooFinance> {
         return urls::symbol(symbol);
     }
 
+    static std::string detail(const std::string_view& symbol)
+    {
+        return "https://query1.finance.yahoo.com/v10/finance/quoteSummary/" + std::string{ symbol } + "?modules=summaryDetail";
+    }
+
     static std::string search(const std::string_view& keyword)
     {
         return "https://query2.finance.yahoo.com/v1/finance/search?q=" + std::string{ keyword } + "&quotesCount=10&newsCount=0";
@@ -105,6 +117,12 @@ struct urls<feed_source::Binance> {
     static std::string quote(const std::string_view& symbol)
     {
         return "https://api.binance.com/api/v3/ticker/24hr?symbol=" + std::string{ symbol };
+    }
+
+    static std::string detail(const std::string_view& symbol)
+    {
+        // Binance doesn't have an API to return similar information as YahooFinance
+        return urls::quote(symbol);
     }
 
     static const std::string& search(const std::string_view&)

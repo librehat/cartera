@@ -16,7 +16,9 @@
  */
 #include "backend.h"
 
-#include "types.h"
+#include "types/types.h"
+#include "types/symboldetails.h"
+#include "types/symbolquote.h"
 
 #include <algorithm>
 #include <boost/range/combine.hpp>
@@ -96,6 +98,20 @@ void Backend::getQuote(const QString& symbol, int source, const QJSValue& callba
     watcher->setFuture(
         QtConcurrent::run([symbol, source, this]() -> Quote {
             return m_feedApi.get_quote(symbol.toStdString(), static_cast<feed_source>(source));
+        })
+    );
+}
+
+void Backend::getSymbolDetails(const QString& symbol, int source, const QJSValue& callback, const QJSValue& errorCb)
+{
+    CREATE_WATCHER(SymbolDetails, callback, errorCb)
+    watcher->setFuture(
+        QtConcurrent::run([symbol, source, this]() -> SymbolDetails {
+            const std::string symbolStr = symbol.toStdString();
+            return SymbolDetails{
+                m_feedApi.get_financial_instrument(symbolStr, static_cast<feed_source>(source)),
+                m_feedApi.get_symbol_detail(symbolStr, static_cast<feed_source>(source))
+            };
         })
     );
 }

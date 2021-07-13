@@ -44,6 +44,10 @@ public:
     // The 'errorCb' must take a single parameter of QString that is the error message
     Q_INVOKABLE void getQuote(const QString& symbol, int source, const QJSValue& callback, const QJSValue& errorCb) const;
 
+    // The 'callback' must take a single parameter of type SymbolDetails
+    // The 'errorCb' must take a single parameter of QString that is the error message
+    Q_INVOKABLE void getSymbolDetails(const QString& symbol, int source, const QJSValue& callback, const QJSValue& errorCb);
+
     // A convenient API for the UI to retrieve necessary data to display in bulk
     // This allows the usage of more efficient APIs to get the quotes for multiple symbols
     // The 'callback' must take a single parameter of type QVector<SymbolQuote>

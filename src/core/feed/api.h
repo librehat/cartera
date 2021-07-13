@@ -40,6 +40,8 @@ public:
     // This function is cached and future calls with the same parameters will return cached results
     financial_instrument get_financial_instrument(const std::string_view& symbol, feed_source source);
 
+    symbol_detail get_symbol_detail(const std::string_view& symbol, feed_source source);
+
     quote get_quote(const std::string_view& symbol, feed_source source) const;
 
     std::vector<quote> get_quotes(const std::vector<position_identifier>& pis) const;

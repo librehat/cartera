@@ -19,7 +19,6 @@
 #define CARTERA_COREQT_TYPES_H
 
 #include <QDateTime>
-#include <QLocale>
 #include <QObject>
 #include <QVariant>
 
@@ -137,53 +136,11 @@ class PositionIdentifier : public position_identifier {
     ENUM_CLASS_PROP_IMPL(getSource, source)
 };
 
-//----------------------------------------------------------------------------
-// Classes below are created specifically for easy UI building
-//----------------------------------------------------------------------------
-
-// This class contains all necessary data fields to be displayed for a symbol
-class SymbolQuote {
-    Q_GADGET
-
-    Q_PROPERTY(QString symbol MEMBER m_symbol)
-    Q_PROPERTY(int source MEMBER m_source)
-    Q_PROPERTY(QString shortName MEMBER m_shortName)
-    Q_PROPERTY(QString longName MEMBER m_longName)
-    Q_PROPERTY(QString currentPriceDisp READ currentPriceDisp)
-    Q_PROPERTY(QString priceChangeDisp READ priceChangeDisp)
-    Q_PROPERTY(QString priceChangePercentDisp READ priceChangePercentDisp)
-    Q_PROPERTY(bool isPositivePriceChange READ isPositivePriceChange)
-
-public:
-    explicit SymbolQuote();
-    explicit SymbolQuote(quote&& quote, financial_instrument&& fi);
-    static SymbolQuote fromData(quote&& quote, financial_instrument&& fi);
-
-    QString currentPriceDisp() const;
-    QString priceChangeDisp() const;
-    QString priceChangePercentDisp() const;
-    inline bool isPositivePriceChange() const { return priceChange() > 0; }
-    inline double priceChange() const { return m_currentPrice - m_prevDayClosePrice; }
-
-private:
-    int m_source;  // must be a valid feed_source enum value
-    QString m_symbol;
-    QString m_longName;
-    QString m_shortName;
-    QString m_currency;
-    double m_currentPrice;
-    double m_prevDayClosePrice;  // old price
-    int m_priceDecimalHint;  // how many decimal places
-
-    QLocale m_locale;  // current system locale
-};
-
 }  // close cartera namespace
 
 Q_DECLARE_METATYPE(cartera::FinancialInstrument)
 Q_DECLARE_METATYPE(cartera::Quote)
 Q_DECLARE_METATYPE(cartera::PositionIdentifier)
-Q_DECLARE_METATYPE(cartera::SymbolQuote)
 
 #undef STL_STRING_PROP_IMPL
 #undef ENUM_CLASS_PROP_IMPL

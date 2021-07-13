@@ -56,6 +56,13 @@ struct feed_finder {
         return feed::basic_feed::resolve_symbol<S>(http_client, symbol);
     }
 
+    static symbol_detail get_detail(feed_source source, const simple_http_client& http_client, const std::string_view& symbol) {
+        if (S != source) {
+            return feed_finder<static_cast<feed_source>(static_cast<int>(S) + 1)>::get_detail(source, http_client, symbol);
+        }
+        return feed::basic_feed::resolve_detail<S>(http_client, symbol);
+    }
+
     static quote get_quote(feed_source source, const simple_http_client& http_client, const std::string_view& symbol) {
         if (S != source) {
             return feed_finder<static_cast<feed_source>(static_cast<int>(S) + 1)>::get_quote(source, http_client, symbol);
@@ -74,6 +81,12 @@ struct feed_finder {
 template<>
 struct feed_finder<feed_source::k_END> {
     static financial_instrument get_financial_instrument(feed_source source, const simple_http_client&, const std::string_view&) {
+        std::ostringstream oss;
+        oss << "Cannot find the feed source=" << source;
+        throw cartera_exception(oss.str());
+    }
+
+    static symbol_detail get_detail(feed_source source, const simple_http_client&, const std::string_view&) {
         std::ostringstream oss;
         oss << "Cannot find the feed source=" << source;
         throw cartera_exception(oss.str());
@@ -117,6 +130,11 @@ financial_instrument api::get_financial_instrument(const std::string_view& symbo
         return res;
     }
     return it->second;
+}
+
+symbol_detail api::get_symbol_detail(const std::string_view& symbol, feed_source source)
+{
+    return feed_finder<feed_source::YahooFinance>::get_detail(source, m_http_client, symbol);
 }
 
 quote api::get_quote(const std::string_view& symbol, feed_source source) const

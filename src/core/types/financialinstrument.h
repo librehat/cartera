@@ -75,10 +75,11 @@ struct financial_instrument
     // std::string isin;  //  ISIN identifies a security (which might be traded at different exchanges under different symbols)
     
     std::string symbol;  // symbol is unique at exchange-level
-    std::string currency;  // ISO4217 currency code
+    std::string currency;  // ISO4217 currency code (most of the time with exception for crypto currency)
     std::string exchange_code;  // shortened exchange code (e.g. LSE, FRA)
     std::string long_name;
     std::string short_name;
+    int price_decimal_places;
 };
 std::ostream& operator<<(std::ostream& os, const financial_instrument& rhs);
 bool operator==(const financial_instrument& lhs, const financial_instrument& rhs);
@@ -103,6 +104,27 @@ struct quote
     std::optional<double> market_cap;  // nullable double
 };
 
+
+struct symbol_detail
+{
+    double day_low_price;
+    double day_high_price;
+    double day_open_price;
+    double prev_day_close_price;
+    double bid_price;
+    double bid_qty;
+    double ask_price;
+    double ask_qty;
+    double volume;
+    std::optional<double> average_ten_day_volume;
+    std::optional<double> fifty_two_week_high_price;
+    std::optional<double> fifty_two_week_low_price;
+    std::optional<double> market_cap;
+    std::optional<double> dividend_rate;
+    std::optional<double> dividend_yield;
+    std::optional<datetime> ex_dividend_date;
+    std::optional<double> beta;
+};
 
 }
 
