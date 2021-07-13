@@ -19,7 +19,7 @@
 int main(int argc, char *argv[])
 {
     QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-    QGuiApplication app(argc, argv);
+    QApplication app(argc, argv);
     KLocalizedString::setApplicationDomain("cartera");
     QCoreApplication::setOrganizationDomain("librehat.com");
     QCoreApplication::setApplicationName("Cartera");
